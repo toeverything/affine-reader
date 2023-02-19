@@ -1,0 +1,11 @@
+{
+  "name": "blocksuite-reader",
+  "version": "0.0.1",
+  "description": "A simple reader for the blocksuite format",
+  "dependencies": {
+    "yjs": "^13.5.2"
+  },
+  "devDependencies": {
+    "delta-to-md": "workspace:*"
+  }
+}
