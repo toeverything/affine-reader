@@ -1,8 +1,7 @@
-import { getBlocksuiteReader } from "blocksuite-reader";
+import { getBlocksuiteReader, WorkspacePage } from "blocksuite-reader";
 import React from "react";
 
 import "./app.css";
-import { WorkspacePage } from "./main";
 
 const defaultWorkspaceId = "mWn__KSlOgS1tdDEjdX6P";
 
