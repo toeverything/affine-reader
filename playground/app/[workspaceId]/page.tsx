@@ -1,4 +1,4 @@
-import { WorkspaceRenderer } from "../workspace-renderer";
+import { WorkspaceRenderer } from "../../components";
 
 export default async function WorkspacePages({
   params,

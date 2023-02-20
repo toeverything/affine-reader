@@ -1,4 +1,4 @@
-import { WorkspaceRenderer } from './workspace-renderer';
+import { WorkspaceRenderer } from '../components';
 
 const defaultWorkspaceId = "mWn__KSlOgS1tdDEjdX6P";
 

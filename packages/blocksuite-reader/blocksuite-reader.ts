@@ -7,9 +7,9 @@ interface ReaderConfig {
   target?: string;
 }
 
-export const getBlocksuiteReader = (config?: ReaderConfig) => {
+export const getBlocksuiteReader = (config: ReaderConfig) => {
   const target = config?.target || "https://app.affine.pro";
-  const workspaceId = config?.workspaceId;
+  const workspaceId = config.workspaceId;
 
   if (!workspaceId || !target) {
     throw new Error("Workspace ID and target are required");

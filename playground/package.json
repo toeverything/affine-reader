@@ -18,8 +18,5 @@
     "react-dom": "18.2.0",
     "typescript": "4.9.5",
     "blocksuite-reader": "workspace:*"
-  },
-  "devDependencies": {
-    "undici": "^5.20.0"
   }
 }
