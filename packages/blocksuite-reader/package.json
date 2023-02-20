@@ -3,13 +3,20 @@
   "version": "0.0.1",
   "description": "A simple reader for the blocksuite format",
   "scripts": {
-    "test": "vitest"
+    "test": "vitest",
+    "build": "tsup index.ts --dts"
   },
   "dependencies": {
     "yjs": "^13.5.2"
   },
   "devDependencies": {
     "delta-to-md": "workspace:*",
+    "tsup": "^6.6.3",
     "vitest": "^0.28.5"
-  }
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ]
 }
