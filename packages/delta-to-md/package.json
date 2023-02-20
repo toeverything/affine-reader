@@ -1,3 +1,9 @@
 {
-  "name": "delta-to-md"
+  "name": "delta-to-md",
+  "devDependencies": {
+    "vitest": "^0.28.5"
+  },
+  "scripts": {
+    "test": "vitest"
+  }
 }

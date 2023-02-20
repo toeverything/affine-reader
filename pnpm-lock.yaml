@@ -22,7 +22,10 @@ importers:
       vitest: 0.28.5
 
   packages/delta-to-md:
-    specifiers: {}
+    specifiers:
+      vitest: ^0.28.5
+    devDependencies:
+      vitest: 0.28.5
 
   playground:
     specifiers:

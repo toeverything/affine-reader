@@ -1,18 +1,18 @@
 // @ts-nocheck
-import {Node} from './utils/node';
+import { Node } from "./utils/node";
 
-import converters  from './delta-converters';
+import converters from "./delta-converters";
 
 export const deltaToMd = (delta) => {
-  return convert(delta, converters).render().trimEnd() + '\n';
-}
+  return convert(delta, converters).render().trimEnd() + "\n";
+};
 
 function convert(ops, converters) {
   let group, line, el, activeInline, beginningOfLine;
   let root = new Node();
 
   function newLine() {
-    el = line = new Node(['', '\n']);
+    el = line = new Node(["", "\n"]);
     root.append(line);
     activeInline = {};
   }
@@ -21,7 +21,7 @@ function convert(ops, converters) {
   for (let i = 0; i < ops.length; i++) {
     let op = ops[i];
 
-    if (typeof op.insert === 'object') {
+    if (typeof op.insert === "object") {
       for (let k in op.insert) {
         if (converters.embed[k]) {
           applyInlineAttributes(op.attributes);
@@ -29,7 +29,7 @@ function convert(ops, converters) {
         }
       }
     } else {
-      let lines = op.insert.split('\n');
+      let lines = op.insert.split("\n");
 
       if (hasBlockLevelAttribute(op.attributes, converters)) {
         // Some line-level styling (ie headings) is applied by inserting a \n
@@ -40,7 +40,7 @@ function convert(ops, converters) {
           for (let attr in op.attributes) {
             if (converters.block[attr]) {
               let fn = converters.block[attr];
-              if (typeof fn === 'object') {
+              if (typeof fn === "object") {
                 if (group && group.type !== attr) {
                   group = null;
                 }
@@ -63,7 +63,7 @@ function convert(ops, converters) {
 
               fn.call(line, op.attributes, group);
               newLine();
-              break
+              break;
             }
           }
         }
@@ -73,7 +73,10 @@ function convert(ops, converters) {
           if ((l > 0 || beginningOfLine) && group && ++group.distance >= 2) {
             group = null;
           }
-          applyInlineAttributes(op.attributes, ops[i + 1] && ops[i + 1].attributes);
+          applyInlineAttributes(
+            op.attributes,
+            ops[i + 1] && ops[i + 1].attributes
+          );
           el.append(lines[l]);
           if (l < lines.length - 1) {
             newLine();
@@ -97,16 +100,16 @@ function convert(ops, converters) {
       seen[tag._format] = true;
       if (!attrs[tag._format]) {
         for (let k in seen) {
-          delete activeInline[k]
+          delete activeInline[k];
         }
-        el = tag.parent()
+        el = tag.parent();
       }
 
-      tag = tag.parent()
+      tag = tag.parent();
     }
 
     for (let attr in attrs) {
-      if (converters.inline[attr]) {
+      if (converters.inline[attr] && attrs[attr]) {
         if (activeInline[attr]) {
           if (activeInline[attr] === attrs[attr]) {
             continue; // do nothing -- we should already be inside this style's tag
@@ -140,8 +143,8 @@ function convert(ops, converters) {
 function hasBlockLevelAttribute(attrs, converters) {
   for (let k in attrs) {
     if (Object.keys(converters.block).includes(k)) {
-      return true
+      return true;
     }
   }
-  return false
+  return false;
 }

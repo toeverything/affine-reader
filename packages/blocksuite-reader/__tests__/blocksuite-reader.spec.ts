@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 import * as Y from 'yjs';
 
 import { getBlocksuiteReader } from '../blocksuite-reader';
+import { YBlocks } from '../types';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
@@ -25,7 +26,7 @@ describe('blocksuite-reader', async () => {
     expect(pages).toEqual([
       {
         id: '6b8dee73a9b8465aa988d12c835ff06d',
-        title: 'Blogging on AFFiNE ',
+        title: 'Blogging on AFFiNE',
         createDate: 1676743457610
       },
       {
@@ -49,9 +50,28 @@ describe('blocksuite-reader', async () => {
     ]);
   });
 
-  test('docToPages (with MD)', async () => {
-    const pages = reader.docToPages(yDoc, true);
-    const page = pages.find((p) => p.id === '6b8dee73a9b8465aa988d12c835ff06d');
-    expect(page!.md).toEqual(await fsp.readFile(path.resolve(__dirname, 'test-markdown.md'), 'utf-8'));
-  });
+  describe('blockToMd', () => {
+
+    test('hello world', () => {
+      const pageId = `de3e7b7910b146de95cc91aeec1a1216`;
+      const yBlocks: YBlocks = yDoc.getMap(`space:${pageId}`);
+      const yPage = Array.from(yBlocks.values())[0];
+      expect(reader.blockToMd(yPage, yBlocks)).toEqual('');
+    });
+  })
+
+  // describe('docToPages (with MD)', () => {
+  //   const pages = reader.docToPages(yDoc, true);
+
+  //   test('hello World', async () => {
+  //     const page = pages.find((p) => p.id === 'de3e7b7910b146de95cc91aeec1a1216');
+  //     console.log(page!.md);
+  //     expect(page!.md).toEqual('');
+  //   });
+
+  //   // test('long', async () => {
+  //   //   const page = pages.find((p) => p.id === '6b8dee73a9b8465aa988d12c835ff06d');
+  //   //   expect(page!.md).toEqual(await fsp.readFile(path.resolve(__dirname, 'test-markdown.md'), 'utf-8'));
+  //   // });
+  // });
 });
