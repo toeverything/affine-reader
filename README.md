@@ -1,4 +1,4 @@
-# blocksuite reader
+# affine-reader
 
 This is a simple reader for the blocksuite YJS doc format.
 The main goal right now is to convert a random YJS doc into a markdown file.
