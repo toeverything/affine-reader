@@ -28,7 +28,7 @@ So I made one on my own:
 
 * grab the public `yDoc`, iteratively get the blocks of each page
 * for each block, convert to MD based on its flavor (it may be also nested)
-* on the leaf `yText`` node, we get the ``delta`` and `convert to MD using  quill-delta-to-markdown
+* on the leaf `yText` node, we get the `delta` and convert to MD using  quill-delta-to-markdown
 You can see the main implementation is a big if/else function:
 
 ```typescript
