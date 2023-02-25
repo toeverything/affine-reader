@@ -1,22 +1,29 @@
 {
   "name": "blocksuite-reader",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A simple reader for the blocksuite format",
   "scripts": {
     "test": "vitest",
-    "build": "tsup index.ts --dts"
-  },
-  "dependencies": {
-    "yjs": "^13.5.2"
+    "build": "tsup index.ts --dts --format cjs,esm"
   },
   "devDependencies": {
     "delta-to-md": "workspace:*",
     "tsup": "^6.6.3",
-    "vitest": "^0.28.5"
+    "vitest": "^0.28.5",
+    "yjs": "^13.5.47"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "module": "./dist/index.mjs",
+      "default": "./dist/index.js"
+    }
+  },
   "files": [
     "dist"
-  ]
+  ],
+  "dependencies": {
+    "undici": "^5.20.0"
+  }
 }

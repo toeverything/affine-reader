@@ -9,3 +9,7 @@ export default async function Home() {
     </main>
   )
 }
+
+export async function generateMetadata() {
+  return { title: 'Blocksuite Workspace Markdown Reader' };
+}
