@@ -4,8 +4,7 @@
 		"tsx": "^3.12.3"
 	},
 	"scripts": {
-		"dev": "pnpm --dir playground dev"
-	},
-	"devDependencies": {
+		"dev": "pnpm --dir playground dev",
+		"postinstall": "pnpm --dir packages/blocksuite-reader build"
 	}
 }
