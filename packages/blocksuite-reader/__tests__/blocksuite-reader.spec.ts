@@ -6,7 +6,6 @@ import { fileURLToPath } from 'url';
 import * as Y from 'yjs';
 
 import { getBlocksuiteReader } from '../blocksuite-reader';
-import { YBlocks } from '../types';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 

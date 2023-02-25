@@ -6,13 +6,11 @@
     "test": "vitest",
     "build": "tsup index.ts --dts"
   },
-  "dependencies": {
-    "yjs": "^13.5.2"
-  },
   "devDependencies": {
     "delta-to-md": "workspace:*",
     "tsup": "^6.6.3",
-    "vitest": "^0.28.5"
+    "vitest": "^0.28.5",
+    "yjs": "^13.5.47"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

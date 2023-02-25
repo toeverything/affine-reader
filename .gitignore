@@ -5,3 +5,5 @@ dist
 # System Files
 .DS_Store
 Thumbs.db
+
+.vscode

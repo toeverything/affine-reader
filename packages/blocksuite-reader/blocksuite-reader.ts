@@ -77,7 +77,7 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
     const childrenIds = yBlock.get("sys:children");
     if (childrenIds instanceof Y.Array) {
       content += childrenIds
-        .map((cid) => {
+        .map((cid: string) => {
           return blockToMd(
             yBlocks.get(cid) as YBlock,
             yBlocks,
