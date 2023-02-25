@@ -12,4 +12,4 @@ export default async function WorkspacePages({
   );
 }
 
-export const revalidate = 0;
+export const revalidate = 60;
