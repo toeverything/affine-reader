@@ -1,0 +1,11 @@
+{
+  "name": "playground",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "tsx watch ./main.ts"
+  },
+  "dependencies": {
+    "blocksuite-reader": "workspace:*"
+  }
+}

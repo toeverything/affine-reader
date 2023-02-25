@@ -1,3 +1,46 @@
+.legend {
+  background-color: #000;
+  color: #fff;
+  font-size: 24px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.legend code {
+  font-size: 14px;
+}
+
+.pageContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 12px;
+  position: relative;
+  margin: 48px 0;
+}
+
 .markdown {
   white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.twoColumnWrapper {
+  display: flex;
+  position: relative;
+  width: 100%;
+  max-width: 100vw;
+  overflow: hidden;
+  gap: 8px;
+  padding: 4px 12px;
+}
+
+.page {
+  flex: 1 0 50%;
+  width: 50%;
+  padding: 0 16px;
+  box-shadow: 0 0 0 1px #000;
+  height: fit-content;
 }

@@ -1,7 +1,27 @@
 import { use } from "react";
 import { getBlocksuiteReader } from "blocksuite-reader";
+import { MDXRemote } from "next-mdx-remote/rsc";
+import remarkGfm from "remark-gfm";
+import rehypePrism from 'rehype-prism-plus';
+
+import './prism.css';
 
 import styles from "./workspace-renderer.module.css";
+
+const mdxComponents = {
+  img: (props: any) => {
+    console.log(props);
+    return (
+      <img
+        {...props}
+        style={{
+          maxWidth: "100%",
+          height: "auto",
+        }}
+      />
+    );
+  },
+};
 
 export function WorkspaceRenderer({ workspaceId }: { workspaceId: string }) {
   const reader = getBlocksuiteReader({
@@ -12,12 +32,33 @@ export function WorkspaceRenderer({ workspaceId }: { workspaceId: string }) {
     <div>
       {pages
         ? pages.map((page) => (
-            <div key={page.id}>
-              <h1>{page.title}</h1>
-              <article>
-                <pre className={styles.markdown}>{page.md}</pre>
-              </article>
-            </div>
+            <fieldset key={page.id} className={styles.pageContainer}>
+              <legend className={styles.legend}>
+                {page.title} |
+                <code>{page.id}</code>
+              </legend>
+              {page.md && (
+                <section className={styles.twoColumnWrapper}>
+                  <article className={styles.page}>
+                    <pre className={styles.markdown}>{page.md}</pre>
+                  </article>
+                  <article className={styles.page}>
+                    {/* @ts-expect-error Server Component */}
+                    <MDXRemote
+                      options={{
+                        mdxOptions: {
+                          // development: process.env.NODE_ENV !== "production",
+                          remarkPlugins: [remarkGfm],
+                          rehypePlugins: [rehypePrism],
+                        },
+                      }}
+                      components={mdxComponents}
+                      source={page.md}
+                    />
+                  </article>
+                </section>
+              )}
+            </fieldset>
           ))
         : "failed to load pages"}
     </div>

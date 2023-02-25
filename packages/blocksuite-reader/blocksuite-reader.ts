@@ -51,7 +51,7 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
           break;
         }
         case "affine:list": {
-          content = "* " + toMd();
+          content = (type === 'bulleted' ? '* ' : '1. ') + toMd();
           break;
         }
         case "affine:code": {
@@ -62,8 +62,16 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
         case "affine:embed": {
           if (type === "image") {
             // https://app.affine.pro/api/workspace/mWn__KSlOgS1tdDEjdX6P/blob/hG9UPLuPwAO_Ahot5ztXkr53NVIRKaMb_7NcPaiK5MQ=
-            const sourceId = yBlock.get("prop:sourceId") as string;
-            content = `![${sourceId}](${target}/api/workspace/${workspaceId}/blob/${sourceId})\n\n`;
+            const sourceId = yBlock.get("prop:sourceId");
+            const width = yBlock.get("prop:width");
+            const height = yBlock.get("prop:height");
+            if (width || height) {
+              content = `\n<img src="${target}/api/workspace/${workspaceId}/blob/${sourceId}" width="${
+                width ?? "auto"
+              }" height="${height ?? "auto"}" />\n\n`;
+            } else {
+              content = `\n![${sourceId}](${target}/api/workspace/${workspaceId}/blob/${sourceId})\n\n`;
+            }
             break;
           }
         }

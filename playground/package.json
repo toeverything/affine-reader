@@ -14,8 +14,11 @@
     "@types/react-dom": "18.0.11",
     "blocksuite-reader": "workspace:*",
     "next": "13.2.1",
+    "next-mdx-remote": "^4.3.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "rehype-prism-plus": "^1.5.1",
+    "remark-gfm": "^3.0.1",
     "typescript": "4.9.5"
   }
 }
