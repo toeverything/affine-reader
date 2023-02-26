@@ -9,9 +9,9 @@
    font-family: "Consolas", "Bitstream Vera Sans Mono", "Courier New", Courier, monospace;
    direction: ltr;
    text-align: left;
-   white-space: pre;
+   white-space: pre-wrap;
    word-spacing: normal;
-   word-break: normal;
+   word-break: break-all;
    font-size: .9em;
    line-height: 1.2em;
  

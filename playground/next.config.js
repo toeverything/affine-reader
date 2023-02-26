@@ -2,7 +2,7 @@
 const nextConfig = {
   experimental: {
     appDir: true,
-    externalMiddlewareRewritesResolve: ['undici']
+    swcMinify: true
   },
 }
 

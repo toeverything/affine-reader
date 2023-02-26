@@ -1,3 +1,7 @@
+.root {
+  padding: 12px;
+}
+
 .legend {
   background-color: #000;
   color: #fff;
@@ -5,8 +9,9 @@
   display: flex;
   gap: 8px;
   align-items: center;
-  padding: 4px;
+  padding: 4px 12px;
   border-radius: 4px;
+  margin-left: 12px;
 }
 
 .legend code {
@@ -19,7 +24,8 @@
   align-items: center;
   font-size: 12px;
   position: relative;
-  margin: 48px 0;
+  margin: 24px 0;
+  padding: 12px;
 }
 
 .markdown {
@@ -43,4 +49,8 @@
   padding: 0 16px;
   box-shadow: 0 0 0 1px #000;
   height: fit-content;
+}
+
+article.page img {
+  max-width: 100%;
 }
