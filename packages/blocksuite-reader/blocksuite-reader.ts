@@ -1,16 +1,18 @@
 import * as Y from "yjs";
-import { fetch } from "undici";
 import { deltaToMd } from "delta-to-md";
 import { YBlock, YBlocks, Flavour, WorkspacePage } from "./types";
 
 interface ReaderConfig {
   workspaceId: string;
   target?: string;
+  Y?: typeof Y;
 }
 
 export const getBlocksuiteReader = (config: ReaderConfig) => {
   const target = config?.target || "https://app.affine.pro";
   const workspaceId = config.workspaceId;
+
+  const YY = config.Y || Y;
 
   if (!workspaceId || !target) {
     throw new Error("Workspace ID and target are required");
@@ -86,7 +88,7 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
       }
 
       const childrenIds = yBlock.get("sys:children");
-      if (childrenIds instanceof Y.Array) {
+      if (childrenIds instanceof YY.Array) {
         content += childrenIds
           .map((cid: string) => {
             return blockToMd(
@@ -126,9 +128,9 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
   const getWorkspaceDoc = async () => {
     const response = await fetch(`${target}/api/public/doc/${workspaceId}`);
     const updates = await response.arrayBuffer();
-    const doc = new Y.Doc();
+    const doc = new YY.Doc();
     try {
-      Y.applyUpdate(doc, new Uint8Array(updates));
+      YY.applyUpdate(doc, new Uint8Array(updates));
     } catch (err) {
       console.error("Error applying update: ", err);
       return null;
