@@ -48,7 +48,7 @@ async function main() {
     const md = page.md!;
     await fsp.writeFile(
       `${dir}/${page.id}/${page.title || "untitled"}.md`,
-      md,
+      md.replaceAll("(https://app.affine.pro/api/workspace/", "./"),
       {
         encoding: "utf8",
       }
