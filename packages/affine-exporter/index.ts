@@ -46,23 +46,25 @@ async function main() {
     );
     await fsp.mkdir(`${dir}/${page.id}`, { recursive: true });
     const md = page.md!;
+
+    const blobPattern = new RegExp(
+      `(https://app.affine.pro/api/workspace/[a-zA-Z0-9_-]+/blob/[a-zA-Z0-9_-]+=)`,
+      "g"
+    );
+
     await fsp.writeFile(
-      `${dir}/${page.id}/${page.title || "untitled"}.md`,
-      md.replaceAll("(https://app.affine.pro/api/workspace/", "./"),
+      `${dir}/${page.id}/${page.title || "no-title"}.md`,
+      md.replaceAll(blobPattern, (match) => {
+        const blobId = match.split("/").pop();
+        return `./${blobId}.png`;
+      }),
       {
         encoding: "utf8",
       }
     );
 
     // find all string that match url like https://app.affine.pro/api/workspace/${workspace_id}/blob/
-    const blobs = Array.from(
-      md.matchAll(
-        new RegExp(
-          "(https://app.affine.pro/api/workspace/[a-zA-Z0-9_-]+/blob/[a-zA-Z0-9_-]+=)",
-          "g"
-        )
-      )
-    );
+    const blobs = Array.from(md.matchAll(blobPattern));
     // save blobs
     for (let blob of blobs) {
       const url = blob[0];
