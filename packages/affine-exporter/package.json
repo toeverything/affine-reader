@@ -1,0 +1,33 @@
+{
+  "name": "affine-exporter",
+  "version": "0.0.1",
+  "description": "A simple exporter to export blocksuite data to the current folder",
+  "scripts": {
+    "dev": "tsx index.ts",
+    "build": "esbuild index.ts --platform=node --bundle --outdir=./bin"
+  },
+  "devDependencies": {
+    "@types/node": "18.14.2",
+    "@types/yargs": "^17.0.22",
+    "asserts": "^4.0.2",
+    "blocksuite-reader": "workspace:*",
+    "esbuild": "^0.17.10",
+    "yargs": "^17.7.1"
+  },
+  "bin": {
+    "blocksuite-exporter": "./bin/index.js"
+  },
+  "main": "bin/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "tsx": "^3.12.3"
+  }
+}

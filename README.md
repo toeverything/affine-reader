@@ -5,7 +5,7 @@ The main goal right now is to convert a random YJS doc into a markdown file.
 
 ## Install
 
-`npm install blocksuite-reader`
+`pnpm install blocksuite-reader`
 
 ## Usage
 
@@ -21,3 +21,9 @@ const pages = await reader.getWorkspacePages(true);
 ```
 
 For a real world use case, see the [demo here](https://affine-reader-playground.vercel.app/) and the code in [playground](./playground) directory, which integrates `blocksuite-reader` with Next.js.
+
+## Export a affine to markdown locally
+
+```
+pnpx affine-exporter <workspace_id>
+```

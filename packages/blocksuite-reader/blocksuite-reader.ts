@@ -53,7 +53,7 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
           break;
         }
         case "affine:list": {
-          content = (type === 'bulleted' ? '* ' : '1. ') + toMd();
+          content = (type === "bulleted" ? "* " : "1. ") + toMd();
           break;
         }
         case "affine:code": {
@@ -125,9 +125,13 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
     return pages;
   };
 
-  const getWorkspaceDoc = async () => {
+  const getWorkspaceDocRaw = async () => {
     const response = await fetch(`${target}/api/public/doc/${workspaceId}`);
-    const updates = await response.arrayBuffer();
+    return await response.arrayBuffer();
+  };
+
+  const getWorkspaceDoc = async (buffer?: ArrayBuffer) => {
+    const updates = buffer ?? (await getWorkspaceDocRaw());
     const doc = new YY.Doc();
     try {
       YY.applyUpdate(doc, new Uint8Array(updates));
@@ -166,6 +170,7 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
   return {
     blockToMd,
     docToPages,
+    getWorkspaceDocRaw,
     getWorkspaceDoc,
     getWorkspacePages,
     getWorkspacePage,

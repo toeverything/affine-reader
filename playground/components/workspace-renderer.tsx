@@ -11,6 +11,7 @@ export function WorkspaceRenderer({ workspaceId }: { workspaceId: string }) {
     workspaceId,
   });
   const pages = use(reader.getWorkspacePages(true));
+
   return (
     <div className={styles.root}>
       {pages
