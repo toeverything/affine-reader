@@ -25,5 +25,11 @@ For a real world use case, see the [demo here](https://affine-reader-playground.
 ## Export a affine to markdown locally
 
 ```
-pnpx affine-exporter <workspace_id>
+Usage: affine-exporter -w [workspace_id] -t [token]
+
+Options:
+      --help          Show help                                        [boolean]
+      --version       Show version number                              [boolean]
+  -t, --token         refresh token                                     [string]
+  -w, --workspace_id  workspace id                                      [string]
 ```
