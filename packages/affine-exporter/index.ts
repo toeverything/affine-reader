@@ -7,28 +7,24 @@ import cliProgress from "cli-progress";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 
+const argv = yargs(hideBin(process.argv))
+  .scriptName("affine-exporter")
+  .usage("Usage: $0 -w <workspace_id> [-t <token>]")
+  .demandOption(["workspace_id"])
+  .option("token", {
+    string: true,
+    alias: "t",
+    description: "refresh token",
+  })
+  .option("workspace_id", {
+    description: "workspace id",
+    alias: "w",
+    string: true,
+  })
+  .parseSync();
+
 async function main() {
-  const argv = yargs(hideBin(process.argv))
-    .scriptName("affine-exporter")
-    .usage("Usage: $0 -w [workspace_id] -t [token]")
-    .option("token", {
-      string: true,
-      alias: "t",
-      description: "refresh token",
-    })
-    .option("workspace_id", {
-      description: "workspace id",
-      alias: "w",
-      string: true,
-    })
-    .parseSync();
-
-  assert(
-    argv.workspace_id,
-    'Please provide a workspace_id (e.g., "H6vffRmJbCfA-r3kq_36_")'
-  );
-
-  const workspace_id = argv.workspace_id;
+  const workspace_id = argv.workspace_id!;
 
   const reader = getBlocksuiteReader({
     workspaceId: workspace_id,
