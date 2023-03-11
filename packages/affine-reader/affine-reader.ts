@@ -4,6 +4,7 @@ import { YBlock, YBlocks, Flavour, WorkspacePage } from "./types";
 
 interface ReaderConfig {
   workspaceId: string;
+  refreshToken?: string;
   target?: string;
   Y?: typeof Y;
 }
@@ -101,7 +102,7 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
       }
       return padLeft + content;
     } catch (e) {
-      console.error("Error converting block to md", e);
+      console.warn("Error converting block to md", e);
       return "";
     }
   }
@@ -118,21 +119,71 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
       pages.forEach((page) => {
         const yBlocks: YBlocks = yDoc.getMap(`space:${page.id}`);
         const yPage = Array.from(yBlocks.values())[0];
-        page.md = blockToMd(yPage, yBlocks);
+        // console.warn("no yPage found for ", page.id);
+        page.md = yPage ? blockToMd(yPage, yBlocks) : "";
       });
     }
 
     return pages;
   };
 
+  const getAccessToken = async () => {
+    if (config.refreshToken) {
+      // we will try to get the access token if refresh token is provided
+      const response = await fetch(`${target}/api/user/token`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          token: config.refreshToken,
+          type: "Refresh",
+        }),
+      });
+
+      if (response.status === 200) {
+        console.log("Got access token");
+        const data = await response.json();
+        return data.token as string;
+      }
+    }
+  };
+
   const getWorkspaceDocRaw = async () => {
-    const response = await fetch(`${target}/api/public/doc/${workspaceId}`);
-    return await response.arrayBuffer();
+    try {
+      if (config.refreshToken) {
+        console.log("refresh token provided, will use private api");
+        const accessToken = await getAccessToken();
+        if (!accessToken) {
+          throw new Error("Failed to get access token");
+        }
+        // will get the workspace doc via private api
+        const response = await fetch(
+          `${target}/api/workspace/${workspaceId}/doc`,
+          {
+            headers: {
+              authorization: accessToken,
+            },
+          }
+        );
+        return await response.arrayBuffer();
+      } else {
+        const response = await fetch(`${target}/api/public/doc/${workspaceId}`);
+        return await response.arrayBuffer();
+      }
+    } catch (err) {
+      console.error("Error getting workspace doc: ", err);
+      return null;
+    }
   };
 
   const getWorkspaceDoc = async (buffer?: ArrayBuffer) => {
     const updates = buffer ?? (await getWorkspaceDocRaw());
     const doc = new YY.Doc();
+    if (!updates) {
+      return doc;
+    }
     try {
       YY.applyUpdate(doc, new Uint8Array(updates));
     } catch (err) {

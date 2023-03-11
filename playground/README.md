@@ -1,1 +1,1 @@
-A simple demo of using `blocksuite-reader` + Next.js (App Layout)
+A simple demo of using `affine-reader` + Next.js (App Layout)

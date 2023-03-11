@@ -5,7 +5,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import * as Y from 'yjs';
 
-import { getBlocksuiteReader } from '../blocksuite-reader';
+import { getBlocksuiteReader } from '../affine-reader';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
@@ -17,7 +17,7 @@ async function loadBinary(filepath: string) {
   return doc;
 }
 
-describe('blocksuite-reader', async () => {
+describe('affine-reader', async () => {
   const reader = getBlocksuiteReader({ workspaceId: 'test'});
   const yDoc = await loadBinary(path.resolve(__dirname, './test-workspace-doc.ydoc'));
   test('docToPages', () => {

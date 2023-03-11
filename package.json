@@ -5,6 +5,6 @@
 	},
 	"scripts": {
 		"dev": "pnpm --dir playground dev",
-		"postinstall": "pnpm --dir packages/blocksuite-reader build"
+		"postinstall": "pnpm --dir packages/affine-reader build"
 	}
 }

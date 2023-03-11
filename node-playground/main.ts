@@ -1,4 +1,4 @@
-import { getBlocksuiteReader } from 'blocksuite-reader';
+import { getBlocksuiteReader } from 'affine-reader';
 
 const reader = getBlocksuiteReader({
   workspaceId: 'mWn__KSlOgS1tdDEjdX6P'
