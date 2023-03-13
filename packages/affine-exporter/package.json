@@ -1,6 +1,6 @@
 {
   "name": "affine-exporter",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "A simple exporter to export blocksuite data to the current folder",
   "scripts": {
     "dev": "tsx index.ts",
@@ -19,5 +19,6 @@
   },
   "bin": {
     "blocksuite-exporter": "./bin/index.js"
-  }
+  },
+  "license": "MIT"
 }

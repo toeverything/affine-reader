@@ -1,6 +1,6 @@
 {
   "name": "affine-reader",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A simple reader for the blocksuite format",
   "scripts": {
     "test": "vitest",
@@ -27,5 +27,6 @@
   },
   "files": [
     "dist"
-  ]
+  ],
+  "license": "MIT"
 }
