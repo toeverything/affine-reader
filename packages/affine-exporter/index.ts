@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import fsp from "node:fs/promises";
+import path from "node:path";
 import assert from "assert";
 import { getBlocksuiteReader } from "affine-reader";
 import cliProgress from "cli-progress";
@@ -21,6 +22,11 @@ const argv = yargs(hideBin(process.argv))
     alias: "w",
     string: true,
   })
+  .option("output_dir", {
+    description: "output directory",
+    alias: "o",
+    string: true,
+  })
   .parseSync();
 
 async function main() {
@@ -32,8 +38,16 @@ async function main() {
   });
 
   const date = new Date();
-  const dir =
-    process.cwd() + `/affine-export/${workspace_id}/${date.toISOString()}`;
+
+  let dir: string = path.join(process.cwd(), "affine-export");
+
+  if (argv.output_dir) {
+    dir = argv.output_dir.startsWith("/")
+      ? argv.output_dir
+      : path.join(process.cwd(), argv.output_dir);
+  }
+
+  dir = path.join(dir, `${workspace_id}/${date.toISOString()}`);
 
   await fsp.mkdir(dir, { recursive: true });
 
@@ -63,6 +77,7 @@ async function main() {
       id: page.id.substring(0, 8),
       title: page.title || "untitled",
     });
+    // using page.id since page.title is not unique
     await fsp.mkdir(`${dir}/${page.id}`, { recursive: true });
     const md = page.md!;
 
