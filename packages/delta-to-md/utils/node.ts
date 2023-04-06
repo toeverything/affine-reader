@@ -44,6 +44,11 @@ export class Node {
       text += this.children[i].render()
     }
     if (this.close) {
+      const inlineMarkers = ['**', '_', '`', '~~'];
+      if (inlineMarkers.includes(this.close) && text.endsWith(' ')) {
+        text = text.trimEnd();
+        this.close += ' ';
+      }
       text += this.close
     }
     return text

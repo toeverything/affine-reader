@@ -17,6 +17,25 @@ test('renders inline format', function() {
   ).toEqual('Hi **mom**\n')
 })
 
+test('renders inline format', function() {
+  expect(
+    deltaToMd([
+      {
+        insert: 'Hi ',
+      },
+      {
+        attributes: {
+          bold: true,
+        },
+        insert: 'mom ',
+      },
+      {
+        insert: '!',
+      },
+    ])
+  ).toEqual('Hi **mom** !\n')
+})
+
 test('renders embed format', function() {
   expect(
     deltaToMd([
