@@ -1,4 +1,4 @@
-import { getBlocksuiteReader } from "@/../packages/affine-reader/dist";
+import { getBlocksuiteReader } from "affine-reader";
 
 import "./prism.css";
 
