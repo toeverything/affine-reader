@@ -162,6 +162,7 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
         const response = await fetch(
           `${target}/api/workspace/${workspaceId}/doc`,
           {
+            cache: "no-cache",
             headers: {
               authorization: accessToken,
             },
@@ -169,7 +170,12 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
         );
         return await response.arrayBuffer();
       } else {
-        const response = await fetch(`${target}/api/public/doc/${workspaceId}`);
+        const response = await fetch(
+          `${target}/api/public/doc/${workspaceId}`,
+          {
+            cache: "no-cache",
+          }
+        );
         return await response.arrayBuffer();
       }
     } catch (err) {

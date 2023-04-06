@@ -45,14 +45,14 @@ importers:
       tsup: ^6.6.3
       typescript: 4.9.5
       vitest: ^0.29.2
-      yjs: ^13.5.47
+      yjs: ^13.5.52
     devDependencies:
       delta-to-md: link:../delta-to-md
       esbuild: 0.17.10
       tsup: 6.6.3_typescript@4.9.5
       typescript: 4.9.5
       vitest: 0.29.2
-      yjs: 13.5.47
+      yjs: 13.5.52
 
   packages/delta-to-md:
     specifiers:
@@ -1467,9 +1467,10 @@ packages:
     engines: {node: '>=6'}
     dev: false
 
-  /lib0/0.2.63:
-    resolution: {integrity: sha512-JhUd/JXR4rnWsSP1zup904ACbVFcdRieWoIGwGAtHww4zms0gNyi8EM30Rfftnk+6A10qQMSufjLM0/ncq06xw==}
+  /lib0/0.2.73:
+    resolution: {integrity: sha512-aJJIElCLWnHMcYZPtsM07QoSfHwpxCy4VUzBYGXFYEmh/h2QS5uZNbCCfL0CqnkOE30b7Tp9DVfjXag+3qzZjQ==}
     engines: {node: '>=14'}
+    hasBin: true
     dependencies:
       isomorphic.js: 0.2.5
     dev: true
@@ -2953,10 +2954,11 @@ packages:
       yargs-parser: 21.1.1
     dev: true
 
-  /yjs/13.5.47:
-    resolution: {integrity: sha512-F7BZ+Bt36OAt+bdSQS7TN43KSxsHjfXWfcLC526tJ3mctO1FYHGEtOrUqpLC7pSp4jPn4rKSYHv1PVQcdb/vIQ==}
+  /yjs/13.5.52:
+    resolution: {integrity: sha512-wTajR70VeI6uztpUk4kMcXYHSRzuUlNyJPdBG9NII0EcFf27DwGduZEm3XbP7VSzlGx5n6uenBhOPX+YuPH/tA==}
+    engines: {node: '>=16.0.0', npm: '>=8.0.0'}
     dependencies:
-      lib0: 0.2.63
+      lib0: 0.2.73
     dev: true
 
   /yocto-queue/1.0.0:
