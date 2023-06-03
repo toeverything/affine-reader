@@ -171,11 +171,12 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
         return await response.arrayBuffer();
       } else {
         const response = await fetch(
-          `${target}/api/public/doc/${workspaceId}`,
+          `${target}/api/public/workspace/${workspaceId}`,
           {
             cache: "no-cache",
           }
         );
+        
         return await response.arrayBuffer();
       }
     } catch (err) {
