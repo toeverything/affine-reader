@@ -34,6 +34,23 @@ test('renders inline format', function() {
       },
     ])
   ).toEqual('Hi **mom** !\n')
+
+  expect(
+    deltaToMd([
+      {
+        insert: 'Hi',
+      },
+      {
+        attributes: {
+          bold: true,
+        },
+        insert: ' dad',
+      },
+      {
+        insert: '!',
+      },
+    ])
+  ).toEqual('Hi **dad**!\n')
 })
 
 test('renders embed format', function() {

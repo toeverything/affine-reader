@@ -8,18 +8,20 @@ export type Flavour = BaseFlavour<
   | "frame"
   | "paragraph"
   | "code"
+  | "note"
   | "list"
   | "divider"
   | "embed"
+  | "image"
   | "surface"
   | "database"
 >;
 
 export interface WorkspacePage {
   id: string;
+  guid: string;
   title: string;
   createDate: number;
   trash?: boolean;
   favorite?: boolean;
-  md?: string;
 }
