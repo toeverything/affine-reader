@@ -1,21 +1,7 @@
 .root {
   padding: 12px;
-}
-
-.legend {
-  background-color: #000;
-  color: #fff;
-  font-size: 24px;
   display: flex;
-  gap: 8px;
-  align-items: center;
-  padding: 4px 12px;
-  border-radius: 4px;
-  margin-left: 12px;
-}
-
-.legend code {
-  font-size: 14px;
+  flex-direction: column;
 }
 
 .pageContainer {
@@ -53,4 +39,9 @@
 
 article.page img {
   max-width: 100%;
+}
+
+.pageLink {
+  color: #000;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }

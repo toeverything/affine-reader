@@ -51,16 +51,16 @@ export function blockToMd(
         break;
       }
       case "affine:image": {
-        // https://app.affine.pro/api/workspace/mWn__KSlOgS1tdDEjdX6P/blobs/hG9UPLuPwAO_Ahot5ztXkr53NVIRKaMb_7NcPaiK5MQ=
+        // https://app.affine.pro/api/workspaces/mWn__KSlOgS1tdDEjdX6P/blobs/hG9UPLuPwAO_Ahot5ztXkr53NVIRKaMb_7NcPaiK5MQ=
         const sourceId = yBlock.get("prop:sourceId");
         const width = yBlock.get("prop:width");
         const height = yBlock.get("prop:height");
         if (width || height) {
-          content = `\n<img src="${target}/api/workspace/${workspaceId}/blobs/${sourceId}" width="${
+          content = `\n<img src="${target}/api/workspaces/${workspaceId}/blobs/${sourceId}" width="${
             width ?? "auto"
           }" height="${height ?? "auto"}" />\n\n`;
         } else {
-          content = `\n![${sourceId}](${target}/api/workspace/${workspaceId}/blobs/${sourceId})\n\n`;
+          content = `\n![${sourceId}](${target}/api/workspaces/${workspaceId}/blobs/${sourceId})\n\n`;
         }
         break;
       }
