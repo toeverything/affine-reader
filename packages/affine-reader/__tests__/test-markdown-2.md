@@ -18,4 +18,4 @@ bb **bb** b**b**
   * asdfasdf aswww
   * asdfsadfsadf `asd`
 
-![BVuxfbqvFihTFwa9rpQtZ9FIOp583p45DGaw7nXaLng=](https://example.com/api/workspace/test/blobs/BVuxfbqvFihTFwa9rpQtZ9FIOp583p45DGaw7nXaLng=)
+![BVuxfbqvFihTFwa9rpQtZ9FIOp583p45DGaw7nXaLng=](https://example.com/api/workspaces/test/blobs/BVuxfbqvFihTFwa9rpQtZ9FIOp583p45DGaw7nXaLng=)

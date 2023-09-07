@@ -5,36 +5,75 @@ import "./prism.css";
 import { use } from "react";
 import { mdToHTML } from "./md-to-html";
 import styles from "./workspace-renderer.module.css";
+import Link from "next/link";
+
+export function PageRenderer({
+  workspaceId,
+  id,
+}: {
+  workspaceId: string;
+  id: string;
+}) {
+  const reader = getBlocksuiteReader({
+    workspaceId,
+  });
+  const page = use(reader.getDocMarkdown(id));
+
+  if (!page) {
+    return null;
+  }
+
+  return (
+    <section className={styles.twoColumnWrapper}>
+      <article className={styles.page}>
+        <pre className={styles.markdown}>{page.md}</pre>
+      </article>
+      <article className={styles.page}>
+        <div dangerouslySetInnerHTML={{ __html: mdToHTML(page.md) }} />
+      </article>
+    </section>
+  );
+}
 
 export function WorkspaceRenderer({ workspaceId }: { workspaceId: string }) {
   const reader = getBlocksuiteReader({
     workspaceId,
   });
-  const pages = use(reader.getWorkspacePages(true));
+  const pages = use(reader.getDocPageMetas());
 
   return (
-    <div className={styles.root}>
-      {pages
-        ? pages.map((page) => (
-            <fieldset key={page.id} className={styles.pageContainer}>
-              <legend className={styles.legend}>
-                {page.title} |<code>{page.id}</code>
-              </legend>
-              {page.md && (
-                <section className={styles.twoColumnWrapper}>
-                  <article className={styles.page}>
-                    <pre className={styles.markdown}>{page.md}</pre>
-                  </article>
-                  <article className={styles.page}>
-                    <div
-                      dangerouslySetInnerHTML={{ __html: mdToHTML(page.md) }}
-                    />
-                  </article>
-                </section>
-              )}
-            </fieldset>
-          ))
-        : "failed to load pages"}
-    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Page</th>
+          <th>Favorite</th>
+          <th>ID</th>
+          <th>GUID</th>
+          <th>Created At</th>
+        </tr>
+      </thead>
+      <tbody>
+        {pages
+          ? pages.map((page) => (
+              <tr key={page.id}>
+                <td>
+                  <Link
+                    className={styles.pageLink}
+                    key={page.id}
+                    href={`/${workspaceId}/${page.guid}`}
+                    passHref
+                  >
+                    {page.title}
+                  </Link>
+                </td>
+                <td>{page.favorite ? "✅" : ""}</td>
+                <td>{page.id}</td>
+                <td>{page.guid}</td>
+                <td>{new Date(page.createDate).toLocaleString()}</td>
+              </tr>
+            ))
+          : "failed to load pages"}
+      </tbody>
+    </table>
   );
 }

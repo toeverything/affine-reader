@@ -1,8 +1,8 @@
 // @ts-nocheck
-let id = 0
+let id = 0;
 
 export class Node {
-  id = ++id
+  id = ++id;
   children: Node[];
   open: string;
   close: string;
@@ -12,50 +12,58 @@ export class Node {
 
   constructor(data?: string[] | string) {
     if (Array.isArray(data)) {
-      this.open = data[0]
-      this.close = data[1]
-    } else if (typeof data === 'string') {
-      this.text = data
+      this.open = data[0];
+      this.close = data[1];
+    } else if (typeof data === "string") {
+      this.text = data;
     }
-    this.children = []
+    this.children = [];
   }
 
   append(e: Node) {
     if (!(e instanceof Node)) {
-      e = new Node(e)
+      e = new Node(e);
     }
     if (e._parent) {
       const idx = e._parent.children.indexOf(e);
       e._parent.children.splice(idx, 1);
     }
-    e._parent = this
-    this.children = this.children.concat(e)
+    e._parent = this;
+    this.children = this.children.concat(e);
   }
 
   render() {
-    let text = ''
+    let text = "";
     if (this.open) {
-      text += this.open
+      text += this.open;
     }
     if (this.text) {
-      text += this.text
+      text += this.text;
     }
     for (let i = 0; i < this.children.length; i++) {
-      text += this.children[i].render()
+      text += this.children[i].render();
     }
     if (this.close) {
-      const inlineMarkers = ['**', '_', '`', '~~'];
-      if (inlineMarkers.includes(this.close) && text.endsWith(' ')) {
+      const inlineMarkers = ["**", "_", "`", "~~"];
+      if (inlineMarkers.includes(this.close) && text.endsWith(" ")) {
         text = text.trimEnd();
-        this.close += ' ';
+        this.close += " ";
       }
-      text += this.close
+
+      if (
+        inlineMarkers.includes(this.close) &&
+        new RegExp(`^${[...this.open].map(c => '\\' + c).join('')}\\s+.*`).test(text)
+      ) {
+        text = text.replaceAll(/\s/g, "");
+        text = " " + text;
+      }
+
+      text += this.close;
     }
-    return text
+    return text;
   }
 
   parent() {
-    return this._parent
+    return this._parent;
   }
 }
-
