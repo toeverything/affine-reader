@@ -107,7 +107,7 @@ export const workspaceDocToPagesMeta = (yDoc: Y.Doc) => {
   });
 
   pages.forEach((page) => {
-    const space = spaces['space:' + page.id];
+    const space = spaces[page.id] || spaces["space:" + page.id];
     page.guid = space.guid;
   });
 
