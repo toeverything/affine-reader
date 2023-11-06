@@ -121,10 +121,19 @@ export const pageDocToMD = (
 ) => {
   // we assume that the first block is the page block
   const yBlocks: YBlocks = pageDoc.getMap("blocks");
-  const yPage = Array.from(yBlocks.values())[0];
-  const title = yPage.get("prop:title") as string;
-  return {
-    title,
-    md: blockToMd(target, workspaceId, yPage, yBlocks),
-  };
+
+  // there are cases that the page is empty due to some weird issues
+  if (yBlocks.size === 0) {
+    return {
+      title: "",
+      md: "",
+    };
+  } else {
+    const yPage = Array.from(yBlocks.values())[0];
+    const title = yPage.get("prop:title") as string;
+    return {
+      title,
+      md: blockToMd(target, workspaceId, yPage, yBlocks),
+    };
+  }
 };
