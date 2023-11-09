@@ -55,9 +55,13 @@ export function blockToMd(
         const sourceId = yBlock.get("prop:sourceId");
         const width = yBlock.get("prop:width");
         const height = yBlock.get("prop:height");
-        content = `\n<img src="${target}/api/workspaces/${workspaceId}/blobs/${sourceId}" width="${
-          width ?? "auto"
-        }" height="${height ?? "auto"}" crossorigin="anonymous" />\n\n`;
+        if (width || height) {
+          content = `\n<img src="${target}/api/workspaces/${workspaceId}/blobs/${sourceId}" width="${
+            width || "auto"
+          }" height="${height || "auto"}" crossorigin="anonymous" />\n\n`;
+        } else {
+          content = `\n![${sourceId}](${target}/api/workspaces/${workspaceId}/blobs/${sourceId})\n\n`;
+        }
         break;
       }
       case "affine:attachment": {
@@ -128,15 +132,18 @@ export const pageDocToMD = (
 ) => {
   // we assume that the first block is the page block
   const yBlocks: YBlocks = pageDoc.getMap("blocks");
+  const maybePageBlock = Object.entries(yBlocks.toJSON()).find(
+    ([_, b]) => b["sys:flavour"] === "affine:page"
+  );
 
   // there are cases that the page is empty due to some weird issues
-  if (yBlocks.size === 0) {
+  if (!maybePageBlock) {
     return {
       title: "",
       md: "",
     };
   } else {
-    const yPage = Array.from(yBlocks.values())[0];
+    const yPage = yBlocks.get(maybePageBlock[0]) as YBlock;
     const title = yPage.get("prop:title") as string;
     return {
       title,
