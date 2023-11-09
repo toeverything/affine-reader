@@ -65,7 +65,9 @@ export function blockToMd(
         if (type.startsWith("video")) {
           // https://app.affine.pro/api/workspaces/mWn__KSlOgS1tdDEjdX6P/blobs/hG9UPLuPwAO_Ahot5ztXkr53NVIRKaMb_7NcPaiK5MQ=
           const sourceId = yBlock.get("prop:sourceId");
-          content = `\n<video autoplay loop preload="auto" src="${target}/api/workspaces/${workspaceId}/blobs/${sourceId}" crossorigin="anonymous" />\n\n`;
+          content = `\n<video muted autoplay loop preload="auto" crossorigin="anonymous">
+            <source src="${target}/api/workspaces/${workspaceId}/blobs/${sourceId}" type="${type}" />
+          </video>\n\n`;
           break;
         }
       }
