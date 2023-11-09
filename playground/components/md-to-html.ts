@@ -7,9 +7,13 @@ import { cache } from "react";
 
 const remarkHtml = unified()
   .use(remarkParse)
-  .use(remarkRehype)
+  .use(remarkRehype, {
+    allowDangerousHtml: true,
+  })
   .use(rehypePrism)
-  .use(rehypeStringify);
+  .use(rehypeStringify, {
+    allowDangerousHtml: true,
+  });
 
 export const mdToHTML = cache((md: string) => {
   const vfile = remarkHtml.processSync(md);
