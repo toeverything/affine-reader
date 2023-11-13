@@ -117,8 +117,10 @@ export const workspaceDocToPagesMeta = (yDoc: Y.Doc) => {
     return b.createDate - a.createDate;
   });
 
+  // guid is not the same as id in page
+  // we need to get the guid from spaces
   pages.forEach((page) => {
-    const space = spaces[page.id] || spaces["space:" + page.id];
+    const space = spaces["space:" + page.id] || spaces[page.id];
     page.guid = space.guid;
   });
 

@@ -1,6 +1,6 @@
 {
   "name": "affine-reader",
-  "version": "2.0.12",
+  "version": "2.0.13",
   "description": "A simple reader for the blocksuite format",
   "scripts": {
     "test": "vitest",
