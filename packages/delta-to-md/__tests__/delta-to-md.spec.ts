@@ -17,6 +17,19 @@ test('renders inline format', function() {
   ).toEqual('Hi **mom**\n')
 })
 
+test('do not render empty bold', function() {
+  expect(
+    deltaToMd([
+      {
+        attributes: {
+          bold: true,
+        },
+        insert: '',
+      },
+    ])
+  ).toEqual('\n')
+})
+
 test('renders inline format', function() {
   expect(
     deltaToMd([
@@ -234,7 +247,7 @@ test('renders adjacent inline formats correctly', function() {
       },
     ])
   ).toEqual(
-    '_Italics! [Italic link](http://example.com)_[ regular link](http://example.com)' +
+    '_Italics! [Italic link](http://example.com)_ [regular link](http://example.com)' +
       '\n'
   )
 });

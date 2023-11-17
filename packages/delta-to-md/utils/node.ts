@@ -33,34 +33,24 @@ export class Node {
   }
 
   render() {
-    let text = "";
-    if (this.open) {
-      text += this.open;
-    }
-    if (this.text) {
-      text += this.text;
-    }
-    for (let i = 0; i < this.children.length; i++) {
-      text += this.children[i].render();
-    }
-    if (this.close) {
-      const inlineMarkers = ["**", "_", "`", "~~"];
-      if (inlineMarkers.includes(this.close) && text.endsWith(" ")) {
-        text = text.trimEnd();
-        this.close += " ";
-      }
+    const inner =
+      (this.text || "") + this.children.map((c) => c.render()).join("");
 
-      if (
-        inlineMarkers.includes(this.close) &&
-        new RegExp(`^${[...this.open].map(c => '\\' + c).join('')}\\s+.*`).test(text)
-      ) {
-        text = text.replaceAll(/\s/g, "");
-        text = " " + text;
-      }
-
-      text += this.close;
+    if (inner.trim() === "" && this.open && this.close) {
+      return "";
     }
-    return text;
+
+    const wrapped = this.open && this.close;
+
+    const fragments = [
+      inner.startsWith(" ") && wrapped ? " " : "",
+      this.open,
+      wrapped ? inner.trim() : inner,
+      this.close,
+      inner.endsWith(" ") && wrapped ? " " : "",
+    ].filter((f) => f);
+
+    return fragments.join("");
   }
 
   parent() {
