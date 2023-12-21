@@ -54,24 +54,26 @@ export function WorkspaceRenderer({ workspaceId }: { workspaceId: string }) {
       </thead>
       <tbody>
         {pages
-          ? pages.map((page) => (
-              <tr key={page.id}>
-                <td>
-                  <Link
-                    className={styles.pageLink}
-                    key={page.id}
-                    href={`/${workspaceId}/${page.guid}`}
-                    passHref
-                  >
-                    {page.title}
-                  </Link>
-                </td>
-                <td>{page.favorite ? "✅" : ""}</td>
-                <td>{page.id}</td>
-                <td>{page.guid}</td>
-                <td>{new Date(page.createDate).toLocaleString()}</td>
-              </tr>
-            ))
+          ? pages
+              .filter((p) => !p.trash)
+              .map((page) => (
+                <tr key={page.id}>
+                  <td>
+                    <Link
+                      className={styles.pageLink}
+                      key={page.id}
+                      href={`/${workspaceId}/${page.guid}`}
+                      passHref
+                    >
+                      {page.title}
+                    </Link>
+                  </td>
+                  <td>{page.favorite ? "✅" : ""}</td>
+                  <td>{page.id}</td>
+                  <td>{page.guid}</td>
+                  <td>{new Date(page.createDate).toLocaleString()}</td>
+                </tr>
+              ))
           : "failed to load pages"}
       </tbody>
     </table>

@@ -1,6 +1,6 @@
 import { WorkspaceRenderer } from '../components';
 
-const defaultWorkspaceId = "H6vffRmJbCfA-r3kq_36_";
+const defaultWorkspaceId = "qf73AF6vzWphbTJdN7KiX";
 
 export default async function Home() {
   return (
