@@ -1,27 +1,27 @@
-import { getBlocksuiteReader } from "affine-reader";
-
 import "./prism.css";
 
 import { use } from "react";
 import { mdToHTML } from "./md-to-html";
 import styles from "./workspace-renderer.module.css";
 import Link from "next/link";
+import { reader } from "@/reader";
 
-export function PageRenderer({
-  workspaceId,
-  id,
-}: {
-  workspaceId: string;
-  id: string;
-}) {
-  const reader = getBlocksuiteReader({
-    workspaceId,
-  });
+export function PageRenderer({ id }: { id: string }) {
+  const pages = use(reader.getDocPageMetas());
   const page = use(reader.getDocMarkdown(id));
 
   if (!page) {
     return null;
   }
+
+  const md = page.md.replaceAll(/\[\]\(LinkedPage,(.*)\)/g, (substr, pageId) => {
+    // find the page title
+    const linkedPage = pages?.find((p) => p.id === pageId);
+    if (!linkedPage) {
+      return substr;
+    }
+    return `[${linkedPage.title}](/${linkedPage.guid})`;
+  });
 
   return (
     <section className={styles.twoColumnWrapper}>
@@ -29,16 +29,13 @@ export function PageRenderer({
         <pre className={styles.markdown}>{page.md}</pre>
       </article>
       <article className={styles.page}>
-        <div dangerouslySetInnerHTML={{ __html: mdToHTML(page.md) }} />
+        <div dangerouslySetInnerHTML={{ __html: mdToHTML(md) }} />
       </article>
     </section>
   );
 }
 
-export function WorkspaceRenderer({ workspaceId }: { workspaceId: string }) {
-  const reader = getBlocksuiteReader({
-    workspaceId,
-  });
+export function WorkspaceRenderer() {
   const pages = use(reader.getDocPageMetas());
 
   return (
@@ -62,7 +59,7 @@ export function WorkspaceRenderer({ workspaceId }: { workspaceId: string }) {
                     <Link
                       className={styles.pageLink}
                       key={page.id}
-                      href={`/${workspaceId}/${page.guid}`}
+                      href={`/${page.guid}`}
                       passHref
                     >
                       {page.title}

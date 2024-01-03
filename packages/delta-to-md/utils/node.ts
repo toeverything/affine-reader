@@ -8,6 +8,7 @@ export class Node {
   close: string;
   text: string;
 
+  _format: string;
   _parent: Node;
 
   constructor(data?: string[] | string) {
@@ -36,18 +37,23 @@ export class Node {
     const inner =
       (this.text || "") + this.children.map((c) => c.render()).join("");
 
-    if (inner.trim() === "" && this.open && this.close) {
+    if (
+      inner.trim() === "" &&
+      this.open === this.close &&
+      this.open &&
+      this.close
+    ) {
       return "";
     }
 
     const wrapped = this.open && this.close;
-
+    const emptyInner = inner.trim() === "";
     const fragments = [
-      inner.startsWith(" ") && wrapped ? " " : "",
+      inner.startsWith(" ") && !emptyInner && wrapped ? " " : "",
       this.open,
       wrapped ? inner.trim() : inner,
       this.close,
-      inner.endsWith(" ") && wrapped ? " " : "",
+      inner.endsWith(" ") && !emptyInner && wrapped ? " " : "",
     ].filter((f) => f);
 
     return fragments.join("");

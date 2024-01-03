@@ -1,15 +1,15 @@
-import { WorkspaceRenderer } from '../components';
-
-const defaultWorkspaceId = "qf73AF6vzWphbTJdN7KiX";
+import { WorkspaceRenderer } from "../components";
 
 export default async function Home() {
   return (
     <main>
-      <WorkspaceRenderer workspaceId={defaultWorkspaceId}  />
+      <WorkspaceRenderer />
     </main>
-  )
+  );
 }
 
 export async function generateMetadata() {
-  return { title: 'Blocksuite Workspace Markdown Reader' };
+  return { title: "Blocksuite Workspace Markdown Reader" };
 }
+
+export const revalidate = 60;

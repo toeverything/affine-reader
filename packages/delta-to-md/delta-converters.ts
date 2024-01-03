@@ -25,12 +25,15 @@ export default {
     link: function (url) {
       return ["[", "](" + url + ")"];
     },
+    reference: function (reference) {
+      return ["[", "](" + reference.type + "," + reference.pageId + ")"];
+    },
     strike: function () {
       return ["~~", "~~"];
     },
     code: function () {
       return ["`", "`"];
-    }
+    },
   },
 
   block: {

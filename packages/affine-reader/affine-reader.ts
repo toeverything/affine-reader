@@ -3,29 +3,63 @@ import { pageDocToMD, workspaceDocToPagesMeta } from "./parser";
 
 interface ReaderConfig {
   workspaceId: string; // root workspace id
-  authorization?: string; // e.g. Bearer xxx (jwt token)
+  sessionToken?: string; // for auth
   target?: string; // e.g. https://insider.affine.pro
   Y?: typeof Y;
+  // given a blob id, return a url to the blob
+  blobUrlHandler?: (blobId: string) => string;
 }
 
+const defaultResourcesUrls = {
+  doc: (target: string, workspaceId: string, docId: string) => {
+    return `${target}/api/workspaces/${workspaceId}/docs/${docId}`;
+  },
+  blob: (target: string, workspaceId: string, blobId: string) => {
+    return `${target}/api/workspaces/${workspaceId}/blobs/${blobId}`;
+  },
+};
+
 export const getBlocksuiteReader = (config: ReaderConfig) => {
-  const target = config?.target || "https://insider.affine.pro";
+  const target = config.target || "https://insider.affine.pro";
   const workspaceId = config.workspaceId;
 
   const YY = config.Y || Y;
 
-  if (!workspaceId || !target) {
+  if (!workspaceId) {
     throw new Error("Workspace ID and target are required");
   }
 
-  const getDocRaw = async (docId = workspaceId) => {
+  const getFetchHeaders = () => {
+    const headers: HeadersInit = {};
+    if (config.sessionToken) {
+      const isSecure = target.startsWith("https://");
+      const cookie = `${isSecure ? "__Secure-" : ""}next-auth.session-token=${
+        config.sessionToken
+      }`;
+      headers["Cookie"] = cookie;
+    }
+    return headers;
+  };
+
+  /**
+   * Get doc binary by id
+   *
+   * @param docId
+   * @returns
+   */
+  const getDocBinary = async (docId = workspaceId) => {
     try {
-      const response = await fetch(
-        `${target}/api/workspaces/${workspaceId}/docs/${docId}`,
-        {
-          cache: "no-cache",
-        }
-      );
+      const url = defaultResourcesUrls.doc(target, workspaceId, docId);
+      const response = await fetch(url, {
+        cache: "no-cache",
+        headers: getFetchHeaders(),
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `Error getting workspace doc: ${response.status} ${response.statusText}`
+        );
+      }
 
       return await response.arrayBuffer();
     } catch (err) {
@@ -34,19 +68,51 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
     }
   };
 
+  /**
+   * Get blob by id
+   *
+   * @param blobId
+   * @returns
+   */
+  const getBlob = async (blobId: string) => {
+    const url = defaultResourcesUrls.blob(target, workspaceId, blobId);
+    try {
+      const res = await fetch(url, {
+        cache: "no-cache",
+        headers: getFetchHeaders(),
+      });
+
+      if (!res.ok) {
+        throw new Error(`Error getting blob: ${res.status} ${res.statusText}`);
+      }
+
+      return res.blob();
+    } catch (err) {
+      console.error("Error getting blob: ", err);
+      return null;
+    }
+  };
+
+  /**
+   * Get doc by id
+   *
+   * @param docId
+   * @param buffer
+   * @returns
+   */
   const getDoc = async (docId = workspaceId, buffer?: ArrayBuffer) => {
-    const updates = buffer ?? (await getDocRaw(docId));
-    const doc = new YY.Doc();
+    const updates = buffer ?? (await getDocBinary(docId));
     if (!updates) {
-      return doc;
+      return null;
     }
     try {
+      const doc = new YY.Doc();
       YY.applyUpdate(doc, new Uint8Array(updates));
+      return doc;
     } catch (err) {
       console.error(`Error applying update, ${docId}: `, err);
       return null;
     }
-    return doc;
   };
 
   const getDocPageMetas = async (docId = workspaceId) => {
@@ -58,18 +124,27 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
     return pageMetas;
   };
 
+  const defaultBlobUrlHandler = (id: string) =>
+    defaultResourcesUrls.blob(target, workspaceId, id);
+
   const getDocMarkdown = async (docId = workspaceId) => {
     const doc = await getDoc(docId);
     if (!doc) {
       return null;
     }
-    const result = pageDocToMD(workspaceId, target, doc);
+    const result = pageDocToMD(
+      workspaceId,
+      target,
+      doc,
+      config.blobUrlHandler ?? defaultBlobUrlHandler
+    );
     return result;
   };
 
   return {
-    getDocRaw,
+    getBlob,
     getDoc,
+    getDocBinary,
     getDocPageMetas,
     getDocMarkdown,
   };
