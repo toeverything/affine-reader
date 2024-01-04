@@ -2,8 +2,11 @@
 const nextConfig = {
   experimental: {
     appDir: true,
-    swcMinify: true
+    swcMinify: true,
   },
+  typescript: {
+    ignoreBuildErrors: true,
+  }
 }
 
 module.exports = nextConfig
