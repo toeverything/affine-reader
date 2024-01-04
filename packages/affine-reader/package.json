@@ -1,6 +1,6 @@
 {
   "name": "affine-reader",
-  "version": "2.0.15",
+  "version": "2.1.1",
   "description": "A simple reader for the blocksuite format",
   "scripts": {
     "test": "vitest",
@@ -22,10 +22,10 @@
     ".": "./index.ts"
   },
   "publishConfig": {
-    "types": "dist/index.d.ts",
+    "access": "public",
+    "types": "./dist/index.d.ts",
     "exports": {
       ".": {
-        "types": "dist/index.d.ts",
         "import": "./dist/index.js"
       }
     }

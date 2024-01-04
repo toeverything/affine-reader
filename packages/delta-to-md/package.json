@@ -1,5 +1,7 @@
 {
   "name": "delta-to-md",
+  "version": "0.0.0",
+  "private": true,
   "devDependencies": {
     "vitest": "^0.28.5"
   },
