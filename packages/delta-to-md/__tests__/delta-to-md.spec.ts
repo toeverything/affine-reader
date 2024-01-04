@@ -373,6 +373,36 @@ test("page links", () => {
     ])
   ).toEqual(
     // pass down to downstream to decide how to render the link
-    "aaa [](LinkedPage,vQ5BY1E2MiPfE6gPaaOht) bbbb\n"
+    "aaa [](LinkedPage:vQ5BY1E2MiPfE6gPaaOht) bbbb\n"
+  );
+});
+
+test("multiple links in a line", () => {
+  expect(
+    deltaToMd([
+      {
+        insert: "children: ",
+      },
+      {
+        insert: " ",
+        attributes: {
+          reference: {
+            type: "LinkedPage",
+            pageId: "g_U_zyDes6dygUxED2eBN",
+          },
+        },
+      },
+      {
+        insert: " ",
+        attributes: {
+          reference: {
+            type: "LinkedPage",
+            pageId: "tDJJliYuoB-cNuXa5Rcke",
+          },
+        },
+      },
+    ])
+  ).toEqual(
+    "children: [](LinkedPage:g_U_zyDes6dygUxED2eBN)[](LinkedPage:tDJJliYuoB-cNuXa5Rcke)\n"
   );
 });
