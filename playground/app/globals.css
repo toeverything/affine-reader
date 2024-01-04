@@ -14,7 +14,6 @@ table {
   border-collapse: collapse;
   margin: 20px 0;
   font-family: "Arial", sans-serif;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 th,
@@ -43,4 +42,10 @@ tbody tr:nth-child(odd) {
 /* Remove border from the last row */
 tr:last-child td {
   border-bottom: none;
+}
+
+span[data-affine-option] {
+  background-color: #eee;
+  padding: 0 4px;
+  margin-right: 4px;
 }

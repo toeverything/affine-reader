@@ -33,5 +33,8 @@
   "files": [
     "dist"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@blocksuite/blocks": "^0.10.0"
+  }
 }

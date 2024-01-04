@@ -100,8 +100,8 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
    * @param buffer
    * @returns
    */
-  const getDoc = async (docId = workspaceId, buffer?: ArrayBuffer) => {
-    const updates = buffer ?? (await getDocBinary(docId));
+  const getDoc = async (docId = workspaceId) => {
+    const updates = await getDocBinary(docId);
     if (!updates) {
       return null;
     }
