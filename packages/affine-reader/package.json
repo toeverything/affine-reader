@@ -17,12 +17,17 @@
     "vitest": "^0.29.2",
     "yjs": "^13.6.1"
   },
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "type": "module",
   "exports": {
-    ".": {
-      "default": "./dist/index.js"
+    ".": "./index.ts"
+  },
+  "publishConfig": {
+    "types": "dist/index.d.ts",
+    "exports": {
+      ".": {
+        "types": "dist/index.d.ts",
+        "import": "./dist/index.js"
+      }
     }
   },
   "files": [
