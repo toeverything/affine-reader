@@ -34,7 +34,6 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
     if (config.jwtToken) {
       headers["Authorization"] = `Bearer ${config.jwtToken}`;
     }
-    console.log("headers: ", headers);
     return headers;
   };
 
