@@ -3,7 +3,7 @@ import { pageDocToMD, workspaceDocToPagesMeta } from "./parser";
 
 interface ReaderConfig {
   workspaceId: string; // root workspace id
-  sessionToken?: string; // for auth
+  jwtToken?: string; // for auth, without "Bearer "
   target?: string; // e.g. https://insider.affine.pro
   Y?: typeof Y;
   // given a blob id, return a url to the blob
@@ -31,13 +31,10 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
 
   const getFetchHeaders = () => {
     const headers: HeadersInit = {};
-    if (config.sessionToken) {
-      const isSecure = target.startsWith("https://");
-      const cookie = `${isSecure ? "__Secure-" : ""}next-auth.session-token=${
-        config.sessionToken
-      }`;
-      headers["Cookie"] = cookie;
+    if (config.jwtToken) {
+      headers["Authorization"] = `Bearer ${config.jwtToken}`;
     }
+    console.log("headers: ", headers);
     return headers;
   };
 
