@@ -17,16 +17,24 @@
     "vitest": "^0.29.2",
     "yjs": "^13.6.1"
   },
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "type": "module",
   "exports": {
-    ".": {
-      "default": "./dist/index.js"
+    ".": "./index.ts"
+  },
+  "publishConfig": {
+    "access": "public",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      ".": {
+        "import": "./dist/index.js"
+      }
     }
   },
   "files": [
     "dist"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@blocksuite/blocks": "^0.10.0"
+  }
 }

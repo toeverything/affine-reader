@@ -98,7 +98,7 @@ function convert(ops, converters) {
       seen = {};
     while (tag._format) {
       seen[tag._format] = true;
-      if (!attrs[tag._format]) {
+      if (!attrs[tag._format] || tag.open !== tag.close) {
         for (let k in seen) {
           delete activeInline[k];
         }

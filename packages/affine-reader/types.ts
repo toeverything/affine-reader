@@ -16,6 +16,7 @@ export type Flavour = BaseFlavour<
   | "surface"
   | "database"
   | "attachment"
+  | "bookmark"
 >;
 
 export interface WorkspacePage {

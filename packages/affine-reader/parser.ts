@@ -1,6 +1,8 @@
 import * as Y from "yjs";
 import { deltaToMd } from "delta-to-md";
-import { YBlock, YBlocks, Flavour, WorkspacePage } from "./types";
+import type { Column, Cell } from "@blocksuite/blocks";
+
+import type { YBlock, YBlocks, Flavour, WorkspacePage } from "./types";
 
 interface BlockToMdContext {
   target: string;
@@ -8,6 +10,14 @@ interface BlockToMdContext {
   docId: string;
   blobUrlHandler: (blobId: string) => string;
 }
+
+export type SerializedCells = {
+  // row
+  [key: string]: {
+    // column
+    [key: string]: Cell;
+  };
+};
 
 export function blockToMd(
   context: BlockToMdContext,
@@ -92,16 +102,95 @@ export function blockToMd(
         }
         break;
       }
+      case "affine:bookmark": {
+        const url = yBlock.get("prop:url") as string;
+        content = `\n[](Bookmark,${url})\n\n`;
+        break;
+      }
+      case "affine:surface": {
+        return ""; // do nothing for surface
+      }
       case "affine:page":
-      case "affine:surface":
       case "affine:note":
       case "affine:frame": {
         content = "";
         resetPadding = true;
         break;
       }
-      default:
+      case "affine:database": {
+        const titleById = Object.fromEntries(
+          (yBlock.get("sys:children") as Y.Array<string>).map((cid) => {
+            return [
+              cid,
+              blockToMd(
+                context,
+                yBlocks.get(cid) as YBlock,
+                yBlocks,
+                ""
+              ).trim(),
+            ] as const;
+          })
+        );
+        const cols = (
+          yBlock.get("prop:columns") as Y.Array<Column>
+        ).toJSON() as Column[];
+
+        const cells = (
+          yBlock.get("prop:cells") as Y.Map<SerializedCells>
+        ).toJSON() as SerializedCells;
+
+        function optionToTagHtml(option: any) {
+          return `<span data-affine-option data-value="${option.id}" data-option-color="${option.color}">${option.value}</span>`;
+        }
+
+        const rows = Object.entries(cells).map(([cid, row]) => {
+          return cols.map((col) => {
+            const value = row[col.id]?.value;
+
+            if (col.type !== "title" && !value) {
+              return "";
+            }
+
+            switch (col.type) {
+              case "title":
+                return titleById[cid];
+              case "select":
+                return optionToTagHtml(
+                  (col.data["options"] as any).find(
+                    (opt: any) => opt.id === value
+                  )
+                );
+              case "multi-select":
+                return (col.data["options"] as any)
+                  .filter((opt: any) => (value as string[]).includes(opt.id))
+                  .map(optionToTagHtml)
+                  .join("");
+              default:
+                return value ?? "";
+            }
+          });
+        });
+
+        const header = cols.map((col) => {
+          return col.name;
+        });
+
+        const divider = cols.map((col) => {
+          return "---";
+        });
+
+        // convert to markdown table
+        return (
+          [header, divider, ...rows]
+            .map((row) => {
+              return "|" + row.join("|") + "|";
+            })
+            .join("\n") + "\n\n"
+        );
+      }
+      default: {
         console.warn("Unknown or unsupported flavour", flavour);
+      }
     }
 
     const childrenIds = yBlock.get("sys:children");
