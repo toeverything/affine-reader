@@ -2,17 +2,23 @@ import { getBlocksuiteReader } from "affine-reader";
 
 const reader = getBlocksuiteReader({
   workspaceId: "qf73AF6vzWphbTJdN7KiX",
+  target: "https://app.affine.pro",
 });
 
 async function main() {
-  const pages = await reader.getDocPageMetas("055f9c4b-497a-43ec-a1c9-29d5baf184b9");
+  const pages = await reader.getDocPageMetas();
 
   if (!pages) {
     return;
   }
 
+  pages.forEach((page) => {
+    console.log(page.title, page.id);
+  });
+
   // get a single page
-  const page = await reader.getDocMarkdown("Mbrqm3CwMwcdqKwb-6L0H");
+  const page = await reader.getDocMarkdown("OvwjWslCyZB8-uV-1dFV3");
+  // console.log(page);
 }
 
 main();

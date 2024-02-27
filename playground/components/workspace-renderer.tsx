@@ -14,7 +14,7 @@ export function PageRenderer({ id }: { id: string }) {
     return null;
   }
 
-  const md = page.md.replaceAll(/\[\]\(LinkedPage:(.*)\)/g, (substr, pageId) => {
+  const md = page.md.replaceAll(/\[\]\(LinkedPage:([\w-_]*)\)/g, (substr, pageId) => {
     // find the page title
     const linkedPage = pages?.find((p) => p.id === pageId);
     if (!linkedPage) {
