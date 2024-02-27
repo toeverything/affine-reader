@@ -1,7 +1,7 @@
 import { getBlocksuiteReader } from "affine-reader";
 
 const reader = getBlocksuiteReader({
-  workspaceId: "055f9c4b-497a-43ec-a1c9-29d5baf184b9",
+  workspaceId: "qf73AF6vzWphbTJdN7KiX",
 });
 
 async function main() {

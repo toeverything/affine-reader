@@ -26,7 +26,7 @@ export default {
       return ["[", "](" + url + ")"];
     },
     reference: function (reference) {
-      return ["[", "](" + reference.type + "," + reference.pageId + ")"];
+      return ["[", "](" + reference.type + ":" + reference.pageId + ")"];
     },
     strike: function () {
       return ["~~", "~~"];

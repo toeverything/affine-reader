@@ -373,6 +373,6 @@ test("page links", () => {
     ])
   ).toEqual(
     // pass down to downstream to decide how to render the link
-    "aaa [](LinkedPage,vQ5BY1E2MiPfE6gPaaOht) bbbb\n"
+    "aaa [](LinkedPage:vQ5BY1E2MiPfE6gPaaOht) bbbb\n"
   );
 });
