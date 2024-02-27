@@ -53,7 +53,13 @@ export function blockToMd(
       }
       case "affine:code": {
         const lang = (yBlock.get("prop:language") as string).toLowerCase();
-        content = "```" + lang + "\n" + toMd() + "```\n\n";
+        // do not transform to delta for code block
+        content =
+          "```" +
+          lang +
+          "\n" +
+          (yBlock.get("prop:text") as Y.Text).toJSON() +
+          "\n```\n\n";
         break;
       }
       case "affine:image": {
