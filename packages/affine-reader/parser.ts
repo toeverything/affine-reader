@@ -143,35 +143,40 @@ export function blockToMd(
           return `<span data-affine-option data-value="${option.id}" data-option-color="${option.color}">${option.value}</span>`;
         }
 
-        const rows = Object.entries(cells).map(([cid, row]) => {
-          return cols
-            .map((col) => {
-              const value = row[col.id]?.value;
+        const rows = Object.entries(cells)
+          .filter(([cid]) => titleById[cid])
+          .map(([cid, row]) => {
+            return cols
+              .map((col) => {
+                const value = row[col.id]?.value;
 
-              if (col.type !== "title" && !value) {
-                return "";
-              }
+                if (col.type !== "title" && !value) {
+                  return "";
+                }
 
-              switch (col.type) {
-                case "title":
-                  return titleById[cid];
-                case "select":
-                  return optionToTagHtml(
-                    (col.data["options"] as any).find(
-                      (opt: any) => opt.id === value
-                    )
-                  );
-                case "multi-select":
-                  return (col.data["options"] as any)
-                    .filter((opt: any) => (value as string[]).includes(opt.id))
-                    .map(optionToTagHtml)
-                    .join("");
-                default:
-                  return value ?? "";
-              }
-            })
-            .map((v) => v.replace(/\n/g, "<br />"));
-        });
+                switch (col.type) {
+                  case "title":
+                    return titleById[cid];
+                  case "select":
+                    return optionToTagHtml(
+                      (col.data["options"] as any).find(
+                        (opt: any) => opt.id === value
+                      )
+                    );
+                  case "multi-select":
+                    return (col.data["options"] as any)
+                      .filter((opt: any) =>
+                        (value as string[]).includes(opt.id)
+                      )
+                      .map(optionToTagHtml)
+                      .join("");
+                  default:
+                    return value ?? "";
+                }
+              })
+              .map((v) => (v ? v.replace(/\n/g, "<br />") : v));
+          })
+          .filter((row) => !row.every((v) => !v));
 
         const header = cols.map((col) => {
           return col.name;
