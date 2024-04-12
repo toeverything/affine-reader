@@ -17,8 +17,8 @@ async function main() {
   });
 
   // get a single page
-  const page = await reader.getDocMarkdown("OvwjWslCyZB8-uV-1dFV3");
-  // console.log(page);
+  const page = await reader.getDocMarkdown("nJpuJDMx4a");
+  console.log(page);
 }
 
 main();

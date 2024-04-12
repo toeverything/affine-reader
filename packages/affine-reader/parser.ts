@@ -144,31 +144,33 @@ export function blockToMd(
         }
 
         const rows = Object.entries(cells).map(([cid, row]) => {
-          return cols.map((col) => {
-            const value = row[col.id]?.value;
+          return cols
+            .map((col) => {
+              const value = row[col.id]?.value;
 
-            if (col.type !== "title" && !value) {
-              return "";
-            }
+              if (col.type !== "title" && !value) {
+                return "";
+              }
 
-            switch (col.type) {
-              case "title":
-                return titleById[cid];
-              case "select":
-                return optionToTagHtml(
-                  (col.data["options"] as any).find(
-                    (opt: any) => opt.id === value
-                  )
-                );
-              case "multi-select":
-                return (col.data["options"] as any)
-                  .filter((opt: any) => (value as string[]).includes(opt.id))
-                  .map(optionToTagHtml)
-                  .join("");
-              default:
-                return value ?? "";
-            }
-          });
+              switch (col.type) {
+                case "title":
+                  return titleById[cid];
+                case "select":
+                  return optionToTagHtml(
+                    (col.data["options"] as any).find(
+                      (opt: any) => opt.id === value
+                    )
+                  );
+                case "multi-select":
+                  return (col.data["options"] as any)
+                    .filter((opt: any) => (value as string[]).includes(opt.id))
+                    .map(optionToTagHtml)
+                    .join("");
+                default:
+                  return value ?? "";
+              }
+            })
+            .map((v) => v.replace(/\n/g, "<br />"));
         });
 
         const header = cols.map((col) => {
