@@ -1,7 +1,7 @@
 {
 	"dependencies": {
-		"@types/assert": "^1.5.6",
-		"tsx": "^3.12.7"
+		"@types/assert": "^1.5.10",
+		"tsx": "^3.14.0"
 	},
 	"scripts": {
 		"dev": "pnpm --dir playground dev",
