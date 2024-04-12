@@ -26,4 +26,17 @@ export interface WorkspacePage {
   createDate: number;
   trash?: boolean;
   favorite?: boolean;
+  properties?: {
+    custom: {
+      id: string;
+      name: string;
+      type: "text" | "checkbox" | "date";
+      required: boolean;
+      icon: string;
+      value: any;
+    }[];
+    system: {
+      journal?: string;
+    };
+  };
 }

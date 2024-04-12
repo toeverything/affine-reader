@@ -216,6 +216,7 @@ export function blockToMd(
 export const workspaceDocToPagesMeta = (yDoc: Y.Doc) => {
   const meta = yDoc.getMap("meta").toJSON();
   const spaces = yDoc.getMap("spaces").toJSON();
+  const properties = yDoc.getMap("affine:workspace-properties").toJSON();
   const pages = meta.pages as WorkspacePage[];
 
   pages.sort((a, b) => {
@@ -227,8 +228,35 @@ export const workspaceDocToPagesMeta = (yDoc: Y.Doc) => {
   pages.forEach((page) => {
     const space = spaces["space:" + page.id] || spaces[page.id];
     page.guid = space.guid;
-  });
 
+    // parse properties
+    const prop = properties?.pageProperties?.[page.id];
+    if (prop) {
+      const customProperties = Object.entries<any>(prop.custom)
+        .map(([key, value]) => {
+          const schema = properties?.schema?.pageProperties?.custom?.[key];
+          if (!schema) {
+            return null;
+          }
+          return {
+            ...schema,
+            ...value,
+          };
+        })
+        .filter((v) => v);
+
+      customProperties.sort((a, b) => {
+        return a.order > b.order ? 1 : a.order < b.order ? -1 : 0;
+      });
+
+      page.properties = {
+        system: {
+          journal: prop.custom?.system?.journal?.value,
+        },
+        custom: customProperties,
+      };
+    }
+  });
   return pages;
 };
 
