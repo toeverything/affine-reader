@@ -69,7 +69,7 @@ export function blockToMd(
           lang +
           "\n" +
           (yBlock.get("prop:text") as Y.Text).toJSON() +
-          "```\n\n";
+          "\n```\n\n";
         break;
       }
       case "affine:image": {
