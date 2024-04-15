@@ -5,7 +5,7 @@ interface ReaderConfig {
   workspaceId: string; // root workspace id
   jwtToken?: string; // for auth, without "Bearer "
   sessionToken?: string; // for auth, will be used in cookie
-  target?: string; // e.g. https://insider.affine.pro
+  target?: string; // e.g. https://app.affine.pro
   Y?: typeof Y;
   // given a blob id, return a url to the blob
   blobUrlHandler?: (blobId: string) => string;
@@ -21,7 +21,7 @@ const defaultResourcesUrls = {
 };
 
 export const getBlocksuiteReader = (config: ReaderConfig) => {
-  const target = config.target || "https://insider.affine.pro";
+  const target = config.target || "https://app.affine.pro";
   const workspaceId = config.workspaceId;
 
   const YY = config.Y || Y;
