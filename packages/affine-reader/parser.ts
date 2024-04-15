@@ -77,7 +77,7 @@ export function blockToMd(
         const width = yBlock.get("prop:width");
         const height = yBlock.get("prop:height");
         // fixme: this may not work if workspace is not public
-        const blobUrl = context.blobUrlHandler(sourceId);
+        const blobUrl = context.blobUrlHandler(sourceId) + ".webp";
         if (width || height) {
           content = `\n<img src="${blobUrl}" width="${
             width || "auto"
