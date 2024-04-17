@@ -58,7 +58,7 @@ export function blockToMd(
         break;
       }
       case "affine:list": {
-        content = (type === "bulleted" ? "* " : "1. ") + toMd();
+        content = (type === "bulleted" ? "* " : "1. ") + toMd() + "\n";
         break;
       }
       case "affine:code": {
@@ -81,7 +81,7 @@ export function blockToMd(
         if (width || height) {
           content = `\n<img src="${blobUrl}" width="${
             width || "auto"
-          }" height="${height || "auto"}" crossorigin="anonymous" />\n\n`;
+          }" height="${height || "auto"}" />\n\n`;
         } else {
           content = `\n![${sourceId}](${blobUrl})\n\n`;
         }
@@ -93,7 +93,7 @@ export function blockToMd(
         // fixme: this may not work if workspace is not public
         const blobUrl = context.blobUrlHandler(sourceId);
         if (type.startsWith("video")) {
-          content = `\n<video muted autoplay loop preload="auto" crossorigin="anonymous" playsinline>
+          content = `\n<video muted autoplay loop preload="auto" playsinline>
             <source src="${blobUrl}" type="${type}" />
           </video>\n\n`;
         } else {
