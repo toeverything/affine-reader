@@ -7,6 +7,7 @@ interface ReaderConfig {
   sessionToken?: string; // for auth, will be used in cookie
   target?: string; // e.g. https://app.affine.pro
   Y?: typeof Y;
+  retry?: number; // retry times. if 429, retry after the given seconds in the header
   // given a blob id, return a url to the blob
   blobUrlHandler?: (blobId: string) => string;
 }
@@ -51,7 +52,10 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
    * @param docId
    * @returns
    */
-  const getDocBinary = async (docId = workspaceId) => {
+  const getDocBinary = async (
+    docId = workspaceId,
+    retryCD = config.retry
+  ): Promise<ArrayBuffer | null> => {
     try {
       const url = defaultResourcesUrls.doc(target, workspaceId, docId);
       const response = await fetch(url, {
@@ -60,6 +64,14 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
       });
 
       if (!response.ok) {
+        if (response.status === 429 && retryCD) {
+          const retryAfter = response.headers.get("Retry-After");
+          await new Promise((resolve) =>
+            setTimeout(resolve, parseInt(retryAfter ?? "60") * 1000)
+          );
+          return getDocBinary(docId, retryCD - 1);
+        }
+
         throw new Error(
           `Error getting workspace doc: ${response.status} ${response.statusText}`
         );
