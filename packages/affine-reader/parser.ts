@@ -2,6 +2,8 @@ import * as Y from "yjs";
 import { deltaToMd } from "delta-to-md";
 import type { Column, Cell } from "@blocksuite/blocks";
 
+import { html } from "common-tags";
+
 import type { YBlock, YBlocks, Flavour, WorkspacePage } from "./types";
 
 interface BlockToMdContext {
@@ -79,9 +81,13 @@ export function blockToMd(
         // fixme: this may not work if workspace is not public
         const blobUrl = context.blobUrlHandler(sourceId) + ".webp";
         if (width || height) {
-          content = `\n<img src="${blobUrl}" width="${
-            width || "auto"
-          }" height="${height || "auto"}" />\n\n`;
+          content = html`
+            <img
+              src="${blobUrl}"
+              width="${width || "auto"}"
+              height="${height || "auto"}"
+            />
+          `;
         } else {
           content = `\n![${sourceId}](${blobUrl})\n\n`;
         }
@@ -93,13 +99,30 @@ export function blockToMd(
         // fixme: this may not work if workspace is not public
         const blobUrl = context.blobUrlHandler(sourceId);
         if (type.startsWith("video")) {
-          content = `\n<video muted autoplay loop preload="auto" playsinline>
-            <source src="${blobUrl}" type="${type}" />
-          </video>\n\n`;
+          content = html`
+            <video muted autoplay loop preload="auto" playsinline>
+              <source src="${blobUrl}" type="${type}" />
+            </video>
+          `;
         } else {
           // assume it is an image
           content = `\n![${sourceId}](${blobUrl})\n\n`;
         }
+        break;
+      }
+      case "affine:embed-youtube": {
+        const videoId = yBlock.get("prop:videoId") as string;
+        // prettier-ignore
+        content = html`
+        <iframe
+          type="text/html"
+          width="100%"
+          height="410px"
+          src="https://www.youtube.com/embed/${videoId}"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen>
+        </iframe>`;
         break;
       }
       case "affine:bookmark": {

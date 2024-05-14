@@ -17,6 +17,7 @@ export type Flavour = BaseFlavour<
   | "database"
   | "attachment"
   | "bookmark"
+  | "embed-youtube"
 >;
 
 export interface WorkspacePage {

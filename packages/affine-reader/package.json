@@ -1,6 +1,6 @@
 {
   "name": "affine-reader",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "description": "A simple reader for the blocksuite format",
   "scripts": {
     "test": "vitest",
@@ -10,6 +10,8 @@
     "prepublish": "pnpm build && cp ../../README.md dist/README.md"
   },
   "devDependencies": {
+    "@types/common-tags": "^1.8.4",
+    "common-tags": "^1.8.2",
     "delta-to-md": "workspace:*",
     "esbuild": "^0.17.19",
     "tsup": "^6.7.0",
