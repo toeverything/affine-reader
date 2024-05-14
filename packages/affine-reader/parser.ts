@@ -99,11 +99,12 @@ export function blockToMd(
         // fixme: this may not work if workspace is not public
         const blobUrl = context.blobUrlHandler(sourceId);
         if (type.startsWith("video")) {
-          content = html`
-            <video muted autoplay loop preload="auto" playsinline>
-              <source src="${blobUrl}" type="${type}" />
-            </video>
-          `;
+          content =
+            html`
+              <video muted autoplay loop preload="auto" playsinline>
+                <source src="${blobUrl}" type="${type}" />
+              </video>
+            ` + "\n\n";
         } else {
           // assume it is an image
           content = `\n![${sourceId}](${blobUrl})\n\n`;
@@ -122,7 +123,7 @@ export function blockToMd(
           frameborder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowfullscreen>
-        </iframe>`;
+        </iframe>` + '\n\n';
         break;
       }
       case "affine:bookmark": {
