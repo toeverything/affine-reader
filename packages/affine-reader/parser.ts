@@ -80,10 +80,12 @@ export function blockToMd(
         const height = yBlock.get("prop:height");
         // fixme: this may not work if workspace is not public
         const blobUrl = context.blobUrlHandler(sourceId) + ".webp";
-        if (width || height) {
+        const caption = yBlock.get("prop:caption") as string;
+        if (width || height || caption) {
           content = html`
             <img
               src="${blobUrl}"
+              alt="${caption}"
               width="${width || "auto"}"
               height="${height || "auto"}"
             />

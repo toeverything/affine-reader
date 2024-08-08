@@ -13,16 +13,18 @@ async function main() {
     return;
   }
 
-  pages.forEach((page) => {
-    console.log(page.title, page.id);
-    reader.getDocMarkdown(page.id);
-  });
+  await reader.getDocMarkdown("s_9N3Eoq9_NWmjCS875by");
 
-  // get a single page
-  for (let i = 0; i < 100; i++) {
-    const page = await reader.getDocMarkdown("nJpuJDMx4a");
-    console.log(page);
-  }
+  // pages.forEach((page) => {
+  //   console.log(page.title, page.id);
+  //   reader.getDocMarkdown(page.id);
+  // });
+
+  // // get a single page
+  // for (let i = 0; i < 100; i++) {
+  //   const page = await reader.getDocMarkdown("nJpuJDMx4a");
+  //   console.log(page);
+  // }
 }
 
 main();
