@@ -37,10 +37,7 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
       headers["Authorization"] = `Bearer ${config.jwtToken}`;
     }
     if (config.sessionToken) {
-      const isSecure = target.startsWith("https://");
-      const cookie = `${isSecure ? "__Secure-" : ""}next-auth.session-token=${
-        config.sessionToken
-      }`;
+      const cookie = `affine_session=${config.sessionToken}`;
       headers["Cookie"] = cookie;
     }
     return headers;
