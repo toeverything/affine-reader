@@ -160,5 +160,14 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
     getDocBinary,
     getDocPageMetas,
     getDocMarkdown,
+    pageDocToMD: (doc: Y.Doc) => {
+      return pageDocToMD(
+        workspaceId,
+        target,
+        doc,
+        config.blobUrlHandler ?? defaultBlobUrlHandler
+      );
+    },
+    workspaceDocToPagesMeta,
   };
 };

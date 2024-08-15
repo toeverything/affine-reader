@@ -13,6 +13,63 @@ interface BlockToMdContext {
   blobUrlHandler: (blobId: string) => string;
 }
 
+interface ParsedBlock {
+  id: string;
+  flavour: Flavour;
+  content: string;
+  children: ParsedBlock[];
+}
+
+interface ParagraphBlock extends ParsedBlock {
+  flavour: "affine:paragraph";
+  type: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "quote";
+}
+
+interface DividerBlock extends ParsedBlock {
+  flavour: "affine:divider";
+}
+
+interface ListBlock extends ParsedBlock {
+  flavour: "affine:list";
+  type: "bulleted" | "numbered";
+}
+
+interface CodeBlock extends ParsedBlock {
+  flavour: "affine:code";
+  language: string;
+}
+
+interface ImageBlock extends ParsedBlock {
+  flavour: "affine:image";
+  sourceId: string;
+  width?: number;
+  height?: number;
+  caption?: string;
+}
+
+interface AttachmentBlock extends ParsedBlock {
+  flavour: "affine:attachment";
+  type: string;
+  sourceId: string;
+}
+
+interface EmbedYoutubeBlock extends ParsedBlock {
+  flavour: "affine:embed-youtube";
+  videoId: string;
+}
+
+interface BookmarkBlock extends ParsedBlock {
+  flavour: "affine:bookmark";
+  url: string;
+}
+
+interface DatabaseBlock extends ParsedBlock {
+  title: string;
+  flavour: "affine:database";
+  columns: Column[];
+  cells: SerializedCells;
+}
+
 export type SerializedCells = {
   // row
   [key: string]: {

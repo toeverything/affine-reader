@@ -1,27 +1,33 @@
 import "./prism.css";
 
-import { use } from "react";
 import { mdToHTML } from "./md-to-html";
 import styles from "./workspace-renderer.module.css";
 import Link from "next/link";
-import { reader } from "@/reader";
+import { WorkspacePage } from "affine-reader";
 
-export function PageRenderer({ id }: { id: string }) {
-  const pages = use(reader.getDocPageMetas());
-  const page = use(reader.getDocMarkdown(id));
+type Page = {
+  title: string;
+  md: string;
+};
 
-  if (!page) {
-    return null;
-  }
-
-  const md = page.md.replaceAll(/\[\]\(LinkedPage:([\w-_]*)\)/g, (substr, pageId) => {
-    // find the page title
-    const linkedPage = pages?.find((p) => p.id === pageId);
-    if (!linkedPage) {
-      return substr;
+export function PageRenderer({
+  page,
+  pages,
+}: {
+  page: Page;
+  pages: WorkspacePage[];
+}) {
+  const md = page.md.replaceAll(
+    /\[\]\(LinkedPage:([\w-_]*)\)/g,
+    (substr, pageId) => {
+      // find the page title
+      const linkedPage = pages?.find((p) => p.id === pageId);
+      if (!linkedPage) {
+        return substr;
+      }
+      return `[${linkedPage.title}](/${linkedPage.guid})`;
     }
-    return `[${linkedPage.title}](/${linkedPage.guid})`;
-  });
+  );
 
   return (
     <section className={styles.twoColumnWrapper}>
@@ -35,9 +41,11 @@ export function PageRenderer({ id }: { id: string }) {
   );
 }
 
-export function WorkspaceRenderer() {
-  const pages = use(reader.getDocPageMetas());
-
+export function WorkspaceRenderer({
+  pages,
+}: {
+  pages: WorkspacePage[] | null;
+}) {
   return (
     <table>
       <thead>

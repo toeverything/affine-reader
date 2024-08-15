@@ -37,6 +37,6 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@blocksuite/blocks": "^0.16.0"
+    "@blocksuite/blocks": "0.17.0-canary-202408121434-8bc42f0"
   }
 }

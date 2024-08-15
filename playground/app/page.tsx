@@ -1,9 +1,11 @@
+import { reader } from "@/reader";
 import { WorkspaceRenderer } from "../components";
 
 export default async function Home() {
+  const pages = await reader.getDocPageMetas();
   return (
     <main>
-      <WorkspaceRenderer />
+      <WorkspaceRenderer pages={pages} />
     </main>
   );
 }
