@@ -64,7 +64,7 @@ describe("affine-reader", async () => {
     const page = await loadBinary(
       path.resolve(__dirname, "./test-workspace-doc.ydoc")
     );
-    const result = pageDocToMD("test", "https://example.com", page);
+    const result = pageDocToMD("test", "https://example.com", page, () => "");
     const expected = await fsp.readFile(
       path.resolve(__dirname, "test-markdown.md"),
       "utf-8"

@@ -13,8 +13,8 @@
     "affine-reader": "workspace:*",
     "asserts": "^4.0.2",
     "cli-progress": "^3.12.0",
-    "esbuild": "^0.17.19",
-    "tsx": "^3.14.0",
+    "esbuild": "^0.23.0",
+    "tsx": "^4.17.0",
     "yargs": "^17.7.2"
   },
   "bin": {
