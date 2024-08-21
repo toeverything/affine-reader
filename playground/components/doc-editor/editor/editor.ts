@@ -1,35 +1,37 @@
-import { AffineEditorContainer } from "@blocksuite/presets";
-import { Doc, Schema } from "@blocksuite/store";
-import { DocCollection } from "@blocksuite/store";
 import { AffineSchemas } from "@blocksuite/blocks";
+import { AffineEditorContainer } from "@blocksuite/presets";
 import "@blocksuite/presets/themes/affine.css";
+import { DocCollection, Schema } from "@blocksuite/store";
 
+import * as Y from "yjs";
 export interface EditorContextType {
   editor: AffineEditorContainer | null;
   collection: DocCollection | null;
   updateCollection: (newCollection: DocCollection) => void;
 }
 
-export function initEditor() {
+export function initEditor(
+  rootDocBin: ArrayBuffer,
+  docId: string,
+  docBin: ArrayBuffer
+) {
   const schema = new Schema().register(AffineSchemas);
   const collection = new DocCollection({ schema });
   collection.meta.initialize();
+  Y.applyUpdate(collection.doc, new Uint8Array(rootDocBin));
 
-  const doc = collection.createDoc({ id: "page1" });
+  const doc = collection.getDoc(docId);
+
+  if (!doc) {
+    throw new Error("Doc not found");
+  }
+
   doc.load(() => {
-    const pageBlockId = doc.addBlock("affine:page", {});
-    // @ts-ignore
-    doc.addBlock("affine:surface", {}, pageBlockId);
-    // @ts-ignore
-    const noteId = doc.addBlock("affine:note", {}, pageBlockId);
-    doc.addBlock("affine:paragraph", {}, noteId);
+    Y.applyUpdate(doc.spaceDoc, new Uint8Array(docBin));
   });
 
   const editor = new AffineEditorContainer();
   editor.doc = doc;
-  editor.slots.docLinkClicked.on(({ docId }) => {
-    const target = <Doc>collection.getDoc(docId);
-    editor.doc = target;
-  });
-  return { editor, collection };
+
+  return { editor, collection, doc };
 }

@@ -13,7 +13,12 @@ const EditorContainer = () => {
     }
   }, [editor]);
 
-  return <div className="editor-container" ref={editorContainerRef}></div>;
+  return (
+    <div
+      style={{ width: "100%", height: "100%" }}
+      ref={editorContainerRef}
+    ></div>
+  );
 };
 
 export default EditorContainer;
