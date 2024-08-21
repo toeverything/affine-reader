@@ -1,5 +1,5 @@
 import * as Y from "yjs";
-import { pageDocToMD, workspaceDocToPagesMeta } from "./parser";
+import { parsePageDoc, workspaceDocToPagesMeta } from "./parser";
 
 interface ReaderConfig {
   workspaceId: string; // root workspace id
@@ -145,7 +145,7 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
     if (!doc) {
       return null;
     }
-    const result = pageDocToMD(
+    const result = parsePageDoc(
       workspaceId,
       target,
       doc,
@@ -159,9 +159,10 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
     getDoc,
     getDocBinary,
     getDocPageMetas,
+    getDocPageContent: getDocMarkdown,
     getDocMarkdown,
-    pageDocToMD: (doc: Y.Doc) => {
-      return pageDocToMD(
+    parsePageDoc: (doc: Y.Doc) => {
+      return parsePageDoc(
         workspaceId,
         target,
         doc,

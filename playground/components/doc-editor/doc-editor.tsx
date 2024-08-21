@@ -57,7 +57,7 @@ export const useWatchChange = (
 
 const parseCollectionData = (rootDoc: Y.Doc, doc: Y.Doc) => {
   const pages = reader.workspaceDocToPagesMeta(rootDoc);
-  const page = reader.pageDocToMD(doc);
+  const page = reader.parsePageDoc(doc);
   return { pages, page };
 };
 

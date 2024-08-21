@@ -5,8 +5,8 @@
   "scripts": {
     "test": "vitest",
     "build": "pnpm bundle && pnpm dts",
-    "bundle": "esbuild index.ts --bundle --outdir=./dist --format=esm --platform=node",
-    "dts": "tsup index.ts --dts-only",
+    "bundle": "node esbuild.config.js",
+    "dts": "tsup --entry index.ts --entry affine-blog.ts --dts-only --format esm",
     "prepublish": "pnpm build && cp ../../README.md dist/README.md"
   },
   "devDependencies": {
@@ -16,19 +16,26 @@
     "esbuild": "^0.23.0",
     "tsup": "^8.2.4",
     "typescript": "5.5.4",
-    "vitest": "^2.0.5",
+    "vitest": "^2.0.5"
+  },
+  "dependencies": {
     "yjs": "^13.6.18"
   },
   "type": "module",
   "exports": {
-    ".": "./index.ts"
+    ".": "./index.ts",
+    "./affine-blog": "./affine-blog.ts"
   },
   "publishConfig": {
     "access": "public",
-    "types": "./dist/index.d.ts",
     "exports": {
       ".": {
-        "import": "./dist/index.js"
+        "import": "./dist/index.js",
+        "types": "./dist/index.d.ts"
+      },
+      "./affine-blog": {
+        "import": "./dist/affine-blog.js",
+        "types": "./dist/affine-blog.d.ts"
       }
     }
   },
@@ -36,7 +43,7 @@
     "dist"
   ],
   "license": "MIT",
-  "dependencies": {
+  "peerDependencies": {
     "@blocksuite/blocks": "0.17.0-canary-202408121434-8bc42f0"
   }
 }
