@@ -1,4 +1,4 @@
-import * as BlogReader from "affine-reader/affine-blog";
+import * as BlogReader from "affine-reader/blog";
 import assert from "assert";
 
 assert(process.env.NEXT_PUBLIC_BLOG_WORKSPACE_ID, "WORKSPACE_ID is required");

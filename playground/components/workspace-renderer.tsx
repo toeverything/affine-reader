@@ -5,24 +5,18 @@ import { omit } from "lodash-es";
 import { mdToHTML } from "./md-to-html";
 import styles from "./workspace-renderer.module.css";
 import Link from "next/link";
-import { WorkspacePage, WorkspacePageContent } from "affine-reader/affine-blog";
+import { WorkspacePage, WorkspacePageContent } from "affine-reader/blog";
 
-export function PageRenderer({
-  page,
-  pages,
-}: {
-  page: WorkspacePageContent;
-  pages: WorkspacePage[];
-}) {
+export function PageRenderer({ page }: { page: WorkspacePageContent }) {
   const md = page.md?.replaceAll(
     /\[\]\(LinkedPage:([\w-_]*)\)/g,
     (substr, pageId) => {
       // find the page title
-      const linkedPage = pages?.find((p) => p.id === pageId);
+      const linkedPage = page.linkedPages?.[pageId];
       if (!linkedPage) {
         return substr;
       }
-      return `[${linkedPage.title}](/${linkedPage.guid})`;
+      return `[${linkedPage.title}(/${linkedPage.slug})](/${linkedPage.id})`;
     }
   );
 
@@ -30,11 +24,17 @@ export function PageRenderer({
     <div>
       <section>
         <legend>Gray Matter</legend>
-        <pre>{JSON.stringify(omit(page, ["md"]), null, 2)}</pre>
+        <pre>
+          {JSON.stringify(
+            omit(page, ["md", "parsedBlocks", "linkedPages"]),
+            null,
+            2
+          )}
+        </pre>
       </section>
       <section className={styles.twoColumnWrapper}>
         <article className={styles.page}>
-          <pre className={styles.markdown}>{page.md}</pre>
+          <pre className={styles.markdown}>{md}</pre>
         </article>
         <article className={styles.page}>
           <div dangerouslySetInnerHTML={{ __html: mdToHTML(md ?? "") }} />

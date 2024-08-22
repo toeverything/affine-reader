@@ -6,7 +6,7 @@
     "test": "vitest",
     "build": "pnpm bundle && pnpm dts",
     "bundle": "node esbuild.config.js",
-    "dts": "tsup --entry index.ts --entry affine-blog.ts --dts-only --format esm",
+    "dts": "tsup --entry index.ts --entry blog.ts --entry template.ts --dts-only --format esm",
     "prepublish": "pnpm build && cp ../../README.md dist/README.md"
   },
   "devDependencies": {
@@ -25,7 +25,8 @@
   "type": "module",
   "exports": {
     ".": "./index.ts",
-    "./affine-blog": "./affine-blog.ts"
+    "./blog": "./blog.ts",
+    "./template": "./template.ts"
   },
   "publishConfig": {
     "access": "public",
@@ -34,9 +35,13 @@
         "import": "./dist/index.js",
         "types": "./dist/index.d.ts"
       },
-      "./affine-blog": {
-        "import": "./dist/affine-blog.js",
-        "types": "./dist/affine-blog.d.ts"
+      "./blog": {
+        "import": "./dist/blog.js",
+        "types": "./dist/blog.d.ts"
+      },
+      "./template": {
+        "import": "./dist/template.js",
+        "types": "./dist/template.d.ts"
       }
     }
   },

@@ -1,7 +1,7 @@
 "use client";
 
 import { blogReader } from "@/reader";
-import { Suspense, useEffect, useMemo, useReducer, useState } from "react";
+import { useEffect, useMemo, useReducer, useState } from "react";
 import { PageRenderer } from "../workspace-renderer";
 import EditorContainer from "./components/EditorContainer";
 import styles from "./doc-editor.module.css";
@@ -10,6 +10,7 @@ import { initEditor } from "./editor/editor";
 
 import { AffineEditorContainer } from "@blocksuite/presets";
 import { DocCollection } from "@blocksuite/store";
+import { WorkspacePageContent } from "affine-reader";
 import * as Y from "yjs";
 
 export const useWatchChange = (
@@ -55,9 +56,19 @@ export const useWatchChange = (
   return counter;
 };
 
-const parseCollectionData = (rootDoc: Y.Doc, doc: Y.Doc, docId: string) => {
+const parseCollectionData = async (
+  rootDoc: Y.Doc,
+  doc: Y.Doc,
+  docId: string
+) => {
   const pages = blogReader.workspaceDocToPagesMeta(rootDoc);
-  const page = blogReader.parsePageDoc(docId, doc);
+  let page = blogReader.parsePageDoc(docId, doc);
+
+  if (!page) {
+    throw new Error("Page not found");
+  }
+
+  page = await blogReader.postprocessPageContent(page);
   return { pages, page };
 };
 
@@ -75,16 +86,26 @@ function DocPreviewEditorImpl({
     [rootDocBin, docId, docBin]
   );
   const counter = useWatchChange(editor, collection);
-  const { pages, page } = useMemo(
-    () => parseCollectionData(collection.doc, doc.spaceDoc, docId),
-    [doc, counter]
-  );
+  const [page, setPage] = useState<WorkspacePageContent | null>(null);
+
+  useEffect(() => {
+    let canceled = false;
+    parseCollectionData(collection.doc, doc.spaceDoc, docId).then(
+      ({ page }) => {
+        if (canceled) return;
+        setPage(page);
+      }
+    );
+    return () => {
+      canceled = true;
+    };
+  }, [doc, counter]);
 
   return (
     <div className={styles.app}>
       <EditorContext.Provider value={{ editor, collection }}>
         <EditorContainer />
-        {page && <PageRenderer page={page} pages={pages} />}
+        {page ? <PageRenderer page={page} /> : <div>Loading...</div>}
       </EditorContext.Provider>
     </div>
   );

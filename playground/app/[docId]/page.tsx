@@ -7,7 +7,6 @@ export default async function WorkspacePages({
 }: {
   params: { docId: string };
 }) {
-  const pages = await blogReader.getDocPageMetas();
   const page = await blogReader.getWorkspacePageContent(params.docId);
   return (
     <main>
@@ -17,7 +16,7 @@ export default async function WorkspacePages({
       <Link href={`/${params.docId}/edit`}>
         <h3>edit</h3>
       </Link>
-      {page && pages && <PageRenderer page={page} pages={pages} />}
+      {page && <PageRenderer page={page} />}
     </main>
   );
 }

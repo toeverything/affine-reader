@@ -65,6 +65,11 @@ export interface BookmarkBlock extends BaseParsedBlock {
   url: string;
 }
 
+export interface EmbedLinkedDocBlock extends BaseParsedBlock {
+  flavour: "affine:embed-linked-doc";
+  pageId: string;
+}
+
 export interface DatabaseBlock extends BaseParsedBlock {
   title: string;
   flavour: "affine:database";
@@ -91,7 +96,7 @@ export type SerializedCells = {
   };
 };
 
-export const parsedBlockToMd = (
+export const parseBlockToMd = (
   block: BaseParsedBlock,
   padding = ""
 ): string => {
@@ -100,10 +105,10 @@ export const parsedBlockToMd = (
       padding +
       block.content +
       "\n" +
-      block.children.map((b) => parsedBlockToMd(b, padding + "  ")).join("")
+      block.children.map((b) => parseBlockToMd(b, padding + "  ")).join("")
     );
   } else {
-    return block.children.map((b) => parsedBlockToMd(b, padding)).join("");
+    return block.children.map((b) => parseBlockToMd(b, padding)).join("");
   }
 };
 
@@ -233,6 +238,17 @@ export function parseBlock(
       case "affine:bookmark": {
         const url = yBlock.get("prop:url") as string;
         result.content = `\n[](Bookmark,${url})\n\n`;
+        Object.assign(result, {
+          url,
+        });
+        break;
+      }
+      case "affine:embed-linked-doc": {
+        const pageId = yBlock.get("prop:pageId") as string;
+        result.content = `\n[](LinkedPage:${pageId})\n\n`;
+        Object.assign(result, {
+          pageId,
+        });
         break;
       }
       case "affine:surface":
@@ -247,7 +263,7 @@ export function parseBlock(
           (yBlock.get("sys:children") as Y.Array<string>).map((cid) => {
             return [
               cid,
-              parsedBlockToMd(
+              parseBlockToMd(
                 parseBlock(context, yBlocks.get(cid) as YBlock, yBlocks)
               ),
             ] as const;
@@ -411,7 +427,7 @@ export const parsePageDoc = (
       blobUrlHandler,
     };
     const rootBlock = parseBlock(context, yPage, yBlocks);
-    const md = parsedBlockToMd(rootBlock);
+    const md = parseBlockToMd(rootBlock);
 
     return {
       title,

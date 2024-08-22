@@ -1,7 +1,7 @@
 import { build } from "esbuild";
 
 build({
-  entryPoints: ["./index.ts", "./affine-blog.ts"],
+  entryPoints: ["./index.ts", "./blog.ts", "./template.ts"],
   bundle: true,
   platform: "node",
   outdir: "dist",

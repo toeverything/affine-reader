@@ -6,8 +6,9 @@ export async function GET(
   { params }: { params: { slug: string[] } }
 ) {
   const slug = params.slug;
-  // redirect to the page
+  // proxy the request to the target server
   return fetch(`${target}/api/${slug.join("/")}`, {
+    cache: "no-cache",
     headers: {
       Cookie: `affine_session=${process.env.SESSION_TOKEN}`,
     },
