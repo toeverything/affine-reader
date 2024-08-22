@@ -96,11 +96,12 @@ export function instantiateReader({
     },
     parsePageDoc: parsePageDoc,
     postprocessPageContent,
+    getLinkedPagesFromMarkdown,
   };
 }
 
 function parsePageDoc(
-  docId: string,
+  pageId: string,
   doc: Y.Doc
 ): Reader.WorkspacePageContent | null {
   if (!reader) {
@@ -127,7 +128,7 @@ function parsePageDoc(
   }
 
   const result: Reader.WorkspacePageContent = {
-    id: docId,
+    id: pageId,
     parsedBlocks: blocks,
   };
 
@@ -158,27 +159,26 @@ function parsePageDoc(
     result.cover = reader.blobUrlHandler(coverResult[0].sourceId) + ".webp";
   }
 
+  const validChildren = blocks.slice(currentIndex);
+
   // return the markdown (without gray matter)
   result.md = Reader.parseBlockToMd({
     id: "fake-id",
     content: "",
     flavour: "affine:page",
-    children: blocks.slice(currentIndex),
+    children: validChildren,
   });
 
   // todo: there is no proper way for now to know the slug of the linked page
   // we have to parse ALL pages and let the client to handle it.
-  return result;
+  return { ...result, parsedBlocks: validChildren };
 }
 
-async function postprocessPageContent(
-  content: Reader.WorkspacePageContent
-): Promise<Reader.WorkspacePageContent> {
-  // get all related pages (LinkedPage:xxx)
-  const linkedPagesIds = content.md?.matchAll(/\[\]\(LinkedPage:([\w-_]*)\)/g);
+async function getLinkedPagesFromMarkdown(md: string) {
+  const linkedPagesIds = md.matchAll(/\[\]\(LinkedPage:([\w-_]*)\)/g);
 
   if (!linkedPagesIds) {
-    return content;
+    return [];
   }
 
   const pageMetas = await rootDocCache.value;
@@ -189,30 +189,39 @@ async function postprocessPageContent(
       if (!page) {
         return null;
       }
-      return [id, await pageContentCache.get(page.guid).value];
+      return pageContentCache.get(page.guid).value;
     })
   );
 
+  return linkedPages.filter(Boolean) as Reader.WorkspacePageContent[];
+}
+
+async function postprocessPageContent(
+  content: Reader.WorkspacePageContent
+): Promise<Reader.WorkspacePageContent> {
+  if (!content.md) {
+    return content;
+  }
+
   return {
     ...content,
-    linkedPages: Object.fromEntries(
-      linkedPages.filter(Boolean) as [string, Reader.WorkspacePageContent][]
-    ),
+    linkedPages: await getLinkedPagesFromMarkdown(content.md),
   };
 }
 
 async function getWorkspacePageContent(
-  id: string
+  guid: string
 ): Promise<Reader.WorkspacePageContent | null> {
   if (!reader) {
     throw new Error("Reader not instantiated");
   }
+  const rootDoc = await rootDocCache.value;
+  const rootBlock = await reader.getDoc(guid);
+  const docId = rootDoc?.find((p) => p.guid === guid)?.id;
 
-  const rootBlock = await reader.getDoc(id);
-
-  if (!rootBlock) {
+  if (!rootBlock || !docId) {
     return null;
   }
 
-  return parsePageDoc(id, rootBlock);
+  return parsePageDoc(docId, rootBlock);
 }

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { PageRenderer } from "../../components";
 import { blogReader } from "@/reader";
 
-export default async function WorkspacePages({
+export default async function WorkspacePage({
   params,
 }: {
   params: { docId: string };

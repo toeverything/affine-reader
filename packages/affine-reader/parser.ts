@@ -5,6 +5,7 @@ import type { Column, Cell } from "@blocksuite/blocks";
 import { html } from "common-tags";
 
 import type { YBlock, YBlocks, Flavour, WorkspacePage } from "./types";
+import { YText } from "yjs/dist/src/internals";
 
 export interface BlockToMdContext {
   target: string;
@@ -259,6 +260,7 @@ export function parseBlock(
         break;
       }
       case "affine:database": {
+        const title = (yBlock.get("prop:title") as YText).toJSON();
         const childrenTitleById = Object.fromEntries(
           (yBlock.get("sys:children") as Y.Array<string>).map((cid) => {
             return [
@@ -328,6 +330,7 @@ export function parseBlock(
             .join("\n") + "\n\n";
 
         Object.assign(result, {
+          title,
           rows: dbRows.map((row) => {
             return Object.fromEntries(row.map((v, i) => [cols[i].name, v]));
           }),
@@ -419,7 +422,7 @@ export const parsePageDoc = (
     };
   } else {
     const yPage = yBlocks.get(maybePageBlock[0]) as YBlock;
-    const title = yPage.get("prop:title") as string;
+    const title = yPage.get("prop:title") as YText;
     const context = {
       target,
       workspaceId,
@@ -430,7 +433,7 @@ export const parsePageDoc = (
     const md = parseBlockToMd(rootBlock);
 
     return {
-      title,
+      title: title.toJSON(),
       parsedBlock: rootBlock,
       md,
     };

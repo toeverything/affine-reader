@@ -58,5 +58,5 @@ export interface WorkspacePageContent {
   md?: string;
   publish?: boolean;
   parsedBlocks: ParsedBlock[];
-  linkedPages?: Record<string, WorkspacePageContent>;
+  linkedPages?: WorkspacePageContent[];
 }

@@ -12,7 +12,7 @@ export function PageRenderer({ page }: { page: WorkspacePageContent }) {
     /\[\]\(LinkedPage:([\w-_]*)\)/g,
     (substr, pageId) => {
       // find the page title
-      const linkedPage = page.linkedPages?.[pageId];
+      const linkedPage = page.linkedPages?.find((p) => p.id === pageId);
       if (!linkedPage) {
         return substr;
       }
@@ -23,7 +23,7 @@ export function PageRenderer({ page }: { page: WorkspacePageContent }) {
   return (
     <div>
       <section>
-        <legend>Gray Matter</legend>
+        <legend>metadata</legend>
         <pre>
           {JSON.stringify(
             omit(page, ["md", "parsedBlocks", "linkedPages"]),
@@ -46,8 +46,10 @@ export function PageRenderer({ page }: { page: WorkspacePageContent }) {
 
 export function WorkspaceRenderer({
   pages,
+  template = false,
 }: {
-  pages: WorkspacePage[] | null;
+  pages?: WorkspacePage[] | null;
+  template?: boolean;
 }) {
   return (
     <table>
@@ -70,7 +72,7 @@ export function WorkspaceRenderer({
                     <Link
                       className={styles.pageLink}
                       key={page.id}
-                      href={`/${page.guid}`}
+                      href={`${template ? "/template" : ""}/${page.guid}`}
                       passHref
                     >
                       {page.title}

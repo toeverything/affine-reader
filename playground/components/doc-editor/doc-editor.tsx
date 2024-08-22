@@ -59,7 +59,8 @@ export const useWatchChange = (
 const parseCollectionData = async (
   rootDoc: Y.Doc,
   doc: Y.Doc,
-  docId: string
+  docId: string,
+  template?: boolean
 ) => {
   const pages = blogReader.workspaceDocToPagesMeta(rootDoc);
   let page = blogReader.parsePageDoc(docId, doc);
@@ -69,6 +70,9 @@ const parseCollectionData = async (
   }
 
   page = await blogReader.postprocessPageContent(page);
+  if (template) {
+    page = await blogReader.postprocessTemplate(page);
+  }
   return { pages, page };
 };
 
@@ -76,10 +80,12 @@ function DocPreviewEditorImpl({
   rootDocBin,
   docBin,
   docId,
+  template = false,
 }: {
   rootDocBin: ArrayBuffer;
   docBin: ArrayBuffer;
   docId: string;
+  template?: boolean;
 }) {
   const { editor, collection, doc } = useMemo(
     () => initEditor(rootDocBin, docId, docBin),
@@ -90,7 +96,7 @@ function DocPreviewEditorImpl({
 
   useEffect(() => {
     let canceled = false;
-    parseCollectionData(collection.doc, doc.spaceDoc, docId).then(
+    parseCollectionData(collection.doc, doc.spaceDoc, docId, template).then(
       ({ page }) => {
         if (canceled) return;
         setPage(page);
@@ -111,7 +117,13 @@ function DocPreviewEditorImpl({
   );
 }
 
-export function DocPreviewEditor({ docId }: { docId: string }) {
+export function DocPreviewEditor({
+  docId,
+  template = false,
+}: {
+  docId: string;
+  template?: boolean;
+}) {
   const [rootDoc, setRootDoc] = useState<ArrayBuffer | null>(null);
   const [doc, setDoc] = useState<ArrayBuffer | null>(null);
 
@@ -123,7 +135,12 @@ export function DocPreviewEditor({ docId }: { docId: string }) {
   return (
     rootDoc &&
     doc && (
-      <DocPreviewEditorImpl rootDocBin={rootDoc} docBin={doc} docId={docId} />
+      <DocPreviewEditorImpl
+        rootDocBin={rootDoc}
+        docBin={doc}
+        docId={docId}
+        template={template}
+      />
     )
   );
 }
