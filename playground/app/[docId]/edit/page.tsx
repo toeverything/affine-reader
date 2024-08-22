@@ -24,6 +24,11 @@ export default function DocPreviewEditorPage({
         <h3>back home</h3>
       </Link>
 
+      <Link href={`/${params.docId}`}>
+        <h3>exit editor</h3>
+      </Link>
+
+      <h3>Note: changes in the editor do not persist</h3>
       <DocPreviewEditor docId={params.docId} />
     </main>
   );

@@ -18,6 +18,7 @@ export interface BaseParsedBlock {
   flavour: Flavour;
   content: string;
   children: BaseParsedBlock[];
+  type?: string;
 }
 
 export interface ParagraphBlock extends BaseParsedBlock {
@@ -42,6 +43,7 @@ export interface CodeBlock extends BaseParsedBlock {
 export interface ImageBlock extends BaseParsedBlock {
   flavour: "affine:image";
   sourceId: string;
+  blobUrl: string;
   width?: number;
   height?: number;
   caption?: string;
@@ -89,7 +91,10 @@ export type SerializedCells = {
   };
 };
 
-const parsedBlockToMd = (block: BaseParsedBlock, padding = ""): string => {
+export const parsedBlockToMd = (
+  block: BaseParsedBlock,
+  padding = ""
+): string => {
   if (block.content) {
     return (
       padding +
@@ -107,14 +112,19 @@ export function parseBlock(
   yBlock: YBlock,
   yBlocks: YBlocks // all blocks
 ): ParsedBlock {
-  try {
-    const id = yBlock.get("sys:id") as string;
-    const flavour = yBlock.get("sys:flavour") as Flavour;
-    const type = yBlock.get("prop:type") as string;
-    const toMd = () => deltaToMd((yBlock.get("prop:text") as Y.Text).toDelta());
-    let rows: Record<string, string>[] = [];
-    let markdownContent = "";
+  const id = yBlock.get("sys:id") as string;
+  const flavour = yBlock.get("sys:flavour") as Flavour;
+  const type = yBlock.get("prop:type") as string;
+  const toMd = () => deltaToMd((yBlock.get("prop:text") as Y.Text).toDelta());
 
+  let result: ParsedBlock = {
+    id,
+    flavour,
+    content: "",
+    children: [],
+    type,
+  };
+  try {
     switch (flavour) {
       case "affine:paragraph": {
         let initial = "";
@@ -133,21 +143,21 @@ export function parseBlock(
         } else if (type === "quote") {
           initial = "> ";
         }
-        markdownContent = initial + toMd() + "\n";
+        result.content = initial + toMd() + "\n";
         break;
       }
       case "affine:divider": {
-        markdownContent = "\n---\n\n";
+        result.content = "\n---\n\n";
         break;
       }
       case "affine:list": {
-        markdownContent = (type === "bulleted" ? "* " : "1. ") + toMd() + "\n";
+        result.content = (type === "bulleted" ? "* " : "1. ") + toMd() + "\n";
         break;
       }
       case "affine:code": {
         const lang = (yBlock.get("prop:language") as string).toLowerCase();
         // do not transform to delta for code block
-        markdownContent =
+        result.content =
           "```" +
           lang +
           "\n" +
@@ -163,7 +173,7 @@ export function parseBlock(
         const blobUrl = context.blobUrlHandler(sourceId) + ".webp";
         const caption = yBlock.get("prop:caption") as string;
         if (width || height || caption) {
-          markdownContent = html`
+          result.content = html`
             <img
               src="${blobUrl}"
               alt="${caption}"
@@ -172,17 +182,24 @@ export function parseBlock(
             />
           `;
         } else {
-          markdownContent = `\n![${sourceId}](${blobUrl})\n\n`;
+          result.content = `\n![${sourceId}](${blobUrl})\n\n`;
         }
+        Object.assign(result, {
+          sourceId,
+          width,
+          height,
+          caption,
+          blobUrl,
+        });
+
         break;
       }
       case "affine:attachment": {
-        const type = yBlock.get("prop:type") as string;
         const sourceId = yBlock.get("prop:sourceId") as string;
         // fixme: this may not work if workspace is not public
         const blobUrl = context.blobUrlHandler(sourceId);
         if (type.startsWith("video")) {
-          markdownContent =
+          result.content =
             html`
               <video muted autoplay loop preload="auto" playsinline>
                 <source src="${blobUrl}" type="${type}" />
@@ -190,14 +207,18 @@ export function parseBlock(
             ` + "\n\n";
         } else {
           // assume it is an image
-          markdownContent = `\n![${sourceId}](${blobUrl})\n\n`;
+          result.content = `\n![${sourceId}](${blobUrl})\n\n`;
         }
+        Object.assign(result, {
+          sourceId,
+          blobUrl,
+        });
         break;
       }
       case "affine:embed-youtube": {
         const videoId = yBlock.get("prop:videoId") as string;
         // prettier-ignore
-        markdownContent = html`
+        result.content = html`
         <iframe
           type="text/html"
           width="100%"
@@ -211,14 +232,14 @@ export function parseBlock(
       }
       case "affine:bookmark": {
         const url = yBlock.get("prop:url") as string;
-        markdownContent = `\n[](Bookmark,${url})\n\n`;
+        result.content = `\n[](Bookmark,${url})\n\n`;
         break;
       }
       case "affine:surface":
       case "affine:page":
       case "affine:note":
       case "affine:frame": {
-        markdownContent = "";
+        result.content = "";
         break;
       }
       case "affine:database": {
@@ -274,11 +295,6 @@ export function parseBlock(
             });
           })
           .filter((row) => !row.every((v) => !v));
-
-        rows = dbRows.map((row) => {
-          return Object.fromEntries(row.map((v, i) => [cols[i].name, v]));
-        });
-
         const header = cols.map((col) => {
           return col.name;
         });
@@ -288,12 +304,18 @@ export function parseBlock(
         });
 
         // convert to markdown table
-        markdownContent =
+        result.content =
           [header, divider, ...dbRows]
             .map((row) => {
               return "|" + row.join("|").replace(/\n/g, "<br />") + "|";
             })
             .join("\n") + "\n\n";
+
+        Object.assign(result, {
+          rows: dbRows.map((row) => {
+            return Object.fromEntries(row.map((v, i) => [cols[i].name, v]));
+          }),
+        });
         break;
       }
       default: {
@@ -302,30 +324,16 @@ export function parseBlock(
     }
 
     const childrenIds = yBlock.get("sys:children");
-    const children =
+    result.children =
       childrenIds instanceof Y.Array && flavour !== "affine:database"
         ? childrenIds.map((cid) =>
             parseBlock(context, yBlocks.get(cid) as YBlock, yBlocks)
           )
         : [];
-    // @ts-ignore
-    return {
-      id,
-      type,
-      flavour,
-      content: markdownContent,
-      children,
-      rows,
-    };
   } catch (e) {
     console.warn("Error converting block to md", e);
-    return {
-      id: yBlock.get("sys:id") as string,
-      flavour: yBlock.get("sys:flavour") as Flavour,
-      content: "",
-      children: [],
-    };
   }
+  return result;
 }
 
 export const workspaceDocToPagesMeta = (yDoc: Y.Doc) => {

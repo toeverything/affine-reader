@@ -1,8 +1,8 @@
-import { reader } from "@/reader";
+import { blogReader } from "@/reader";
 import { WorkspaceRenderer } from "../components";
 
 export default async function Home() {
-  const pages = await reader.getDocPageMetas();
+  const pages = await blogReader.getDocPageMetas();
   return (
     <main>
       <WorkspaceRenderer pages={pages} />

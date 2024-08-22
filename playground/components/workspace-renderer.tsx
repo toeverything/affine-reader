@@ -1,23 +1,20 @@
 import "./prism.css";
 
+import { omit } from "lodash-es";
+
 import { mdToHTML } from "./md-to-html";
 import styles from "./workspace-renderer.module.css";
 import Link from "next/link";
-import { WorkspacePage } from "affine-reader";
-
-type Page = {
-  title: string;
-  md: string;
-};
+import { WorkspacePage, WorkspacePageContent } from "affine-reader/affine-blog";
 
 export function PageRenderer({
   page,
   pages,
 }: {
-  page: Page;
+  page: WorkspacePageContent;
   pages: WorkspacePage[];
 }) {
-  const md = page.md.replaceAll(
+  const md = page.md?.replaceAll(
     /\[\]\(LinkedPage:([\w-_]*)\)/g,
     (substr, pageId) => {
       // find the page title
@@ -30,14 +27,20 @@ export function PageRenderer({
   );
 
   return (
-    <section className={styles.twoColumnWrapper}>
-      <article className={styles.page}>
-        <pre className={styles.markdown}>{page.md}</pre>
-      </article>
-      <article className={styles.page}>
-        <div dangerouslySetInnerHTML={{ __html: mdToHTML(md) }} />
-      </article>
-    </section>
+    <div>
+      <section>
+        <legend>Gray Matter</legend>
+        <pre>{JSON.stringify(omit(page, ["md"]), null, 2)}</pre>
+      </section>
+      <section className={styles.twoColumnWrapper}>
+        <article className={styles.page}>
+          <pre className={styles.markdown}>{page.md}</pre>
+        </article>
+        <article className={styles.page}>
+          <div dangerouslySetInnerHTML={{ __html: mdToHTML(md ?? "") }} />
+        </article>
+      </section>
+    </div>
   );
 }
 

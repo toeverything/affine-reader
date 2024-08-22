@@ -1,16 +1,16 @@
 "use client";
 
-import { reader } from "@/reader";
-import { Suspense, use, useEffect, useMemo, useReducer, useState } from "react";
+import { blogReader } from "@/reader";
+import { Suspense, useEffect, useMemo, useReducer, useState } from "react";
 import { PageRenderer } from "../workspace-renderer";
 import EditorContainer from "./components/EditorContainer";
 import styles from "./doc-editor.module.css";
 import { EditorContext } from "./editor/context";
 import { initEditor } from "./editor/editor";
 
-import * as Y from "yjs";
 import { AffineEditorContainer } from "@blocksuite/presets";
 import { DocCollection } from "@blocksuite/store";
+import * as Y from "yjs";
 
 export const useWatchChange = (
   editor: AffineEditorContainer,
@@ -55,9 +55,9 @@ export const useWatchChange = (
   return counter;
 };
 
-const parseCollectionData = (rootDoc: Y.Doc, doc: Y.Doc) => {
-  const pages = reader.workspaceDocToPagesMeta(rootDoc);
-  const page = reader.parsePageDoc(doc);
+const parseCollectionData = (rootDoc: Y.Doc, doc: Y.Doc, docId: string) => {
+  const pages = blogReader.workspaceDocToPagesMeta(rootDoc);
+  const page = blogReader.parsePageDoc(docId, doc);
   return { pages, page };
 };
 
@@ -76,7 +76,7 @@ function DocPreviewEditorImpl({
   );
   const counter = useWatchChange(editor, collection);
   const { pages, page } = useMemo(
-    () => parseCollectionData(collection.doc, doc.spaceDoc),
+    () => parseCollectionData(collection.doc, doc.spaceDoc, docId),
     [doc, counter]
   );
 
@@ -90,13 +90,13 @@ function DocPreviewEditorImpl({
   );
 }
 
-function _DocPreviewEditor({ docId }: { docId: string }) {
+export function DocPreviewEditor({ docId }: { docId: string }) {
   const [rootDoc, setRootDoc] = useState<ArrayBuffer | null>(null);
   const [doc, setDoc] = useState<ArrayBuffer | null>(null);
 
   useEffect(() => {
-    reader.getDocBinary().then(setRootDoc);
-    reader.getDocBinary(docId).then(setDoc);
+    blogReader.getDocBinary().then(setRootDoc);
+    blogReader.getDocBinary(docId).then(setDoc);
   }, [docId]);
 
   return (
@@ -106,11 +106,3 @@ function _DocPreviewEditor({ docId }: { docId: string }) {
     )
   );
 }
-
-export const DocPreviewEditor = ({ docId }: { docId: string }) => {
-  return (
-    <Suspense>
-      <_DocPreviewEditor docId={docId} />
-    </Suspense>
-  );
-};

@@ -1,15 +1,14 @@
 import Link from "next/link";
 import { PageRenderer } from "../../components";
-import { reader } from "@/reader";
+import { blogReader } from "@/reader";
 
 export default async function WorkspacePages({
   params,
 }: {
   params: { docId: string };
 }) {
-  const pages = await reader.getDocPageMetas();
-  const page = await reader.getDocMarkdown(params.docId);
-
+  const pages = await blogReader.getDocPageMetas();
+  const page = await blogReader.getWorkspacePageContent(params.docId);
   return (
     <main>
       <Link href={"/"}>

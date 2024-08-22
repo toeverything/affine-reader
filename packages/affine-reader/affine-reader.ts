@@ -140,21 +140,19 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
   const defaultBlobUrlHandler = (id: string) =>
     defaultResourcesUrls.blob(target, workspaceId, id);
 
+  const blobUrlHandler = config.blobUrlHandler ?? defaultBlobUrlHandler;
+
   const getDocMarkdown = async (docId = workspaceId) => {
     const doc = await getDoc(docId);
     if (!doc) {
       return null;
     }
-    const result = parsePageDoc(
-      workspaceId,
-      target,
-      doc,
-      config.blobUrlHandler ?? defaultBlobUrlHandler
-    );
+    const result = parsePageDoc(workspaceId, target, doc, blobUrlHandler);
     return result;
   };
 
   return {
+    blobUrlHandler,
     getBlob,
     getDoc,
     getDocBinary,
@@ -162,12 +160,7 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
     getDocPageContent: getDocMarkdown,
     getDocMarkdown,
     parsePageDoc: (doc: Y.Doc) => {
-      return parsePageDoc(
-        workspaceId,
-        target,
-        doc,
-        config.blobUrlHandler ?? defaultBlobUrlHandler
-      );
+      return parsePageDoc(workspaceId, target, doc, blobUrlHandler);
     },
     workspaceDocToPagesMeta,
   };
