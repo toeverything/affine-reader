@@ -1,4 +1,5 @@
 import * as Y from "yjs";
+import { ParsedBlock } from "./parser";
 
 export type YBlock = Y.Map<unknown>;
 export type YBlocks = Y.Map<YBlock>;
@@ -18,6 +19,7 @@ export type Flavour = BaseFlavour<
   | "attachment"
   | "bookmark"
   | "embed-youtube"
+  | "embed-linked-doc"
 >;
 
 export interface WorkspacePage {
@@ -40,4 +42,21 @@ export interface WorkspacePage {
       journal?: string;
     };
   };
+}
+
+export interface WorkspacePageContent {
+  title?: string;
+  authors?: string[];
+  tags?: string[];
+  id: string;
+  slug?: string;
+  ["slug-alt"]?: string;
+  cover?: string;
+  description?: string;
+  created?: number;
+  updated?: number;
+  md?: string;
+  publish?: boolean;
+  parsedBlocks: ParsedBlock[];
+  linkedPages?: WorkspacePageContent[];
 }

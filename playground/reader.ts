@@ -1,11 +1,13 @@
-import { getBlocksuiteReader } from "affine-reader";
+import * as reader from "affine-reader/template";
+
 import assert from "assert";
 
-assert(process.env.WORKSPACE_ID, "WORKSPACE_ID is required");
+assert(process.env.NEXT_PUBLIC_BLOG_WORKSPACE_ID, "WORKSPACE_ID is required");
 
-export const reader = getBlocksuiteReader({
-  workspaceId: process.env.WORKSPACE_ID,
-  jwtToken: process.env.JWT_TOKEN,
-  sessionToken: process.env.SESSION_TOKEN,
-  target: process.env.TARGET_SERVER_URL,
+export const blogReader = reader.instantiateReader({
+  workspaceId: process.env.NEXT_PUBLIC_BLOG_WORKSPACE_ID,
+  target:
+    process.env.NODE_ENV === "development"
+      ? "http://localhost:3000"
+      : "https://affine-reader-playground.vercel.app",
 });
