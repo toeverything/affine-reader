@@ -13,14 +13,13 @@ The following will create a reader for a workspace and then get all the pages in
 Page markdown is available in `.md` property.
 
 ```js
-const { getBlocksuiteReader } = require('affine-reader');
+const { getBlocksuiteReader } = require("affine-reader");
 
-const reader = await getBlocksuiteReader({ workspaceId: 'workspace-id' })
+const reader = await getBlocksuiteReader({ workspaceId: "workspace-id" });
 const pages = await reader.getWorkspacePages(true);
-
 ```
 
-For a real world use case, see the [demo here](https://affine-reader-playground.vercel.app/) and the code in [playground](./playground) directory, which integrates `affine-reader` with Next.js.
+For a real world use case, see the [demo here](https://affine-reader.vercel.app//) and the code in [playground](./playground) directory, which integrates `affine-reader` with Next.js.
 
 ## Export a affine to markdown locally
 
