@@ -3,7 +3,7 @@ import path from "node:path";
 import * as Y from "yjs";
 import { describe, expect, test } from "vitest";
 import { loadDocFromPath } from "./util";
-import { pageDocToMD, workspaceDocToPagesMeta } from "../parser";
+import { parsePageDoc, workspaceDocToPagesMeta } from "../parser";
 
 const getTestJSON = async () => {
   return await loadDocFromPath(path.resolve(__dirname, "./saved_doc.json"));
@@ -64,7 +64,7 @@ describe("affine-reader", async () => {
     const page = await loadBinary(
       path.resolve(__dirname, "./test-workspace-doc.ydoc")
     );
-    const result = pageDocToMD("test", "https://example.com", page, () => "");
+    const result = parsePageDoc("test", "https://example.com", page, () => "");
     const expected = await fsp.readFile(
       path.resolve(__dirname, "test-markdown.md"),
       "utf-8"

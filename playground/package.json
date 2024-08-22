@@ -9,11 +9,16 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@blocksuite/blocks": "0.17.0-canary-202408121434-8bc42f0",
+    "@blocksuite/presets": "0.17.0-canary-202408121434-8bc42f0",
+    "@blocksuite/store": "0.17.0-canary-202408121434-8bc42f0",
+    "@types/lodash-es": "^4.17.12",
     "@types/node": "18.14.2",
     "@types/react": "18.0.28",
     "@types/react-dom": "18.0.11",
     "affine-reader": "workspace:*",
-    "next": "13.2.3",
+    "lodash-es": "^4.17.21",
+    "next": "^14.0.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-error-boundary": "^4.0.13",
@@ -23,6 +28,7 @@
     "remark-parse": "^11.0.0",
     "remark-rehype": "^11.1.0",
     "typescript": "5.5.4",
-    "unified": "^11.0.5"
+    "unified": "^11.0.5",
+    "yjs": "^13.6.18"
   }
 }

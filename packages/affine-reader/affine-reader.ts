@@ -1,5 +1,5 @@
 import * as Y from "yjs";
-import { pageDocToMD, workspaceDocToPagesMeta } from "./parser";
+import { parsePageDoc, workspaceDocToPagesMeta } from "./parser";
 
 interface ReaderConfig {
   workspaceId: string; // root workspace id
@@ -140,25 +140,28 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
   const defaultBlobUrlHandler = (id: string) =>
     defaultResourcesUrls.blob(target, workspaceId, id);
 
+  const blobUrlHandler = config.blobUrlHandler ?? defaultBlobUrlHandler;
+
   const getDocMarkdown = async (docId = workspaceId) => {
     const doc = await getDoc(docId);
     if (!doc) {
       return null;
     }
-    const result = pageDocToMD(
-      workspaceId,
-      target,
-      doc,
-      config.blobUrlHandler ?? defaultBlobUrlHandler
-    );
+    const result = parsePageDoc(workspaceId, target, doc, blobUrlHandler);
     return result;
   };
 
   return {
+    blobUrlHandler,
     getBlob,
     getDoc,
     getDocBinary,
     getDocPageMetas,
+    getDocPageContent: getDocMarkdown,
     getDocMarkdown,
+    parsePageDoc: (doc: Y.Doc) => {
+      return parsePageDoc(workspaceId, target, doc, blobUrlHandler);
+    },
+    workspaceDocToPagesMeta,
   };
 };

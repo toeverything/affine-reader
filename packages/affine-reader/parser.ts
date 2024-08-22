@@ -5,13 +5,89 @@ import type { Column, Cell } from "@blocksuite/blocks";
 import { html } from "common-tags";
 
 import type { YBlock, YBlocks, Flavour, WorkspacePage } from "./types";
+import { YText } from "yjs/dist/src/internals";
 
-interface BlockToMdContext {
+export interface BlockToMdContext {
   target: string;
   workspaceId: string;
   docId: string;
   blobUrlHandler: (blobId: string) => string;
 }
+
+export interface BaseParsedBlock {
+  id: string;
+  flavour: Flavour;
+  content: string;
+  children: BaseParsedBlock[];
+  type?: string;
+}
+
+export interface ParagraphBlock extends BaseParsedBlock {
+  flavour: "affine:paragraph";
+  type: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "quote";
+}
+
+export interface DividerBlock extends BaseParsedBlock {
+  flavour: "affine:divider";
+}
+
+export interface ListBlock extends BaseParsedBlock {
+  flavour: "affine:list";
+  type: "bulleted" | "numbered";
+}
+
+export interface CodeBlock extends BaseParsedBlock {
+  flavour: "affine:code";
+  language: string;
+}
+
+export interface ImageBlock extends BaseParsedBlock {
+  flavour: "affine:image";
+  sourceId: string;
+  blobUrl: string;
+  width?: number;
+  height?: number;
+  caption?: string;
+}
+
+export interface AttachmentBlock extends BaseParsedBlock {
+  flavour: "affine:attachment";
+  type: string;
+  sourceId: string;
+}
+
+export interface EmbedYoutubeBlock extends BaseParsedBlock {
+  flavour: "affine:embed-youtube";
+  videoId: string;
+}
+
+export interface BookmarkBlock extends BaseParsedBlock {
+  flavour: "affine:bookmark";
+  url: string;
+}
+
+export interface EmbedLinkedDocBlock extends BaseParsedBlock {
+  flavour: "affine:embed-linked-doc";
+  pageId: string;
+}
+
+export interface DatabaseBlock extends BaseParsedBlock {
+  title: string;
+  flavour: "affine:database";
+  rows: Record<string, string>[];
+}
+
+export type ParsedBlock =
+  | ParagraphBlock
+  | DividerBlock
+  | ListBlock
+  | CodeBlock
+  | ImageBlock
+  | AttachmentBlock
+  | EmbedYoutubeBlock
+  | BookmarkBlock
+  | DatabaseBlock
+  | BaseParsedBlock;
 
 export type SerializedCells = {
   // row
@@ -21,19 +97,40 @@ export type SerializedCells = {
   };
 };
 
-export function blockToMd(
+export const parseBlockToMd = (
+  block: BaseParsedBlock,
+  padding = ""
+): string => {
+  if (block.content) {
+    return (
+      padding +
+      block.content +
+      "\n" +
+      block.children.map((b) => parseBlockToMd(b, padding + "  ")).join("")
+    );
+  } else {
+    return block.children.map((b) => parseBlockToMd(b, padding)).join("");
+  }
+};
+
+export function parseBlock(
   context: BlockToMdContext,
   yBlock: YBlock,
-  yBlocks: YBlocks,
-  padLeft = ""
-): string {
-  try {
-    const flavour = yBlock.get("sys:flavour") as Flavour;
-    const type = yBlock.get("prop:type") as string;
-    const toMd = () => deltaToMd((yBlock.get("prop:text") as Y.Text).toDelta());
-    let content = "";
-    let resetPadding = false;
+  yBlocks: YBlocks // all blocks
+): ParsedBlock {
+  const id = yBlock.get("sys:id") as string;
+  const flavour = yBlock.get("sys:flavour") as Flavour;
+  const type = yBlock.get("prop:type") as string;
+  const toMd = () => deltaToMd((yBlock.get("prop:text") as Y.Text).toDelta());
 
+  let result: ParsedBlock = {
+    id,
+    flavour,
+    content: "",
+    children: [],
+    type,
+  };
+  try {
     switch (flavour) {
       case "affine:paragraph": {
         let initial = "";
@@ -52,21 +149,21 @@ export function blockToMd(
         } else if (type === "quote") {
           initial = "> ";
         }
-        content = initial + toMd() + "\n";
+        result.content = initial + toMd() + "\n";
         break;
       }
       case "affine:divider": {
-        content = "\n---\n\n";
+        result.content = "\n---\n\n";
         break;
       }
       case "affine:list": {
-        content = (type === "bulleted" ? "* " : "1. ") + toMd() + "\n";
+        result.content = (type === "bulleted" ? "* " : "1. ") + toMd() + "\n";
         break;
       }
       case "affine:code": {
         const lang = (yBlock.get("prop:language") as string).toLowerCase();
         // do not transform to delta for code block
-        content =
+        result.content =
           "```" +
           lang +
           "\n" +
@@ -82,7 +179,7 @@ export function blockToMd(
         const blobUrl = context.blobUrlHandler(sourceId) + ".webp";
         const caption = yBlock.get("prop:caption") as string;
         if (width || height || caption) {
-          content = html`
+          result.content = html`
             <img
               src="${blobUrl}"
               alt="${caption}"
@@ -91,17 +188,24 @@ export function blockToMd(
             />
           `;
         } else {
-          content = `\n![${sourceId}](${blobUrl})\n\n`;
+          result.content = `\n![${sourceId}](${blobUrl})\n\n`;
         }
+        Object.assign(result, {
+          sourceId,
+          width,
+          height,
+          caption,
+          blobUrl,
+        });
+
         break;
       }
       case "affine:attachment": {
-        const type = yBlock.get("prop:type") as string;
         const sourceId = yBlock.get("prop:sourceId") as string;
         // fixme: this may not work if workspace is not public
         const blobUrl = context.blobUrlHandler(sourceId);
         if (type.startsWith("video")) {
-          content =
+          result.content =
             html`
               <video muted autoplay loop preload="auto" playsinline>
                 <source src="${blobUrl}" type="${type}" />
@@ -109,14 +213,18 @@ export function blockToMd(
             ` + "\n\n";
         } else {
           // assume it is an image
-          content = `\n![${sourceId}](${blobUrl})\n\n`;
+          result.content = `\n![${sourceId}](${blobUrl})\n\n`;
         }
+        Object.assign(result, {
+          sourceId,
+          blobUrl,
+        });
         break;
       }
       case "affine:embed-youtube": {
         const videoId = yBlock.get("prop:videoId") as string;
         // prettier-ignore
-        content = html`
+        result.content = html`
         <iframe
           type="text/html"
           width="100%"
@@ -130,30 +238,36 @@ export function blockToMd(
       }
       case "affine:bookmark": {
         const url = yBlock.get("prop:url") as string;
-        content = `\n[](Bookmark,${url})\n\n`;
+        result.content = `\n[](Bookmark,${url})\n\n`;
+        Object.assign(result, {
+          url,
+        });
         break;
       }
-      case "affine:surface": {
-        return ""; // do nothing for surface
+      case "affine:embed-linked-doc": {
+        const pageId = yBlock.get("prop:pageId") as string;
+        result.content = `\n[](LinkedPage:${pageId})\n\n`;
+        Object.assign(result, {
+          pageId,
+        });
+        break;
       }
+      case "affine:surface":
       case "affine:page":
       case "affine:note":
       case "affine:frame": {
-        content = "";
-        resetPadding = true;
+        result.content = "";
         break;
       }
       case "affine:database": {
-        const titleById = Object.fromEntries(
+        const title = (yBlock.get("prop:title") as YText).toJSON();
+        const childrenTitleById = Object.fromEntries(
           (yBlock.get("sys:children") as Y.Array<string>).map((cid) => {
             return [
               cid,
-              blockToMd(
-                context,
-                yBlocks.get(cid) as YBlock,
-                yBlocks,
-                ""
-              ).trim(),
+              parseBlockToMd(
+                parseBlock(context, yBlocks.get(cid) as YBlock, yBlocks)
+              ),
             ] as const;
           })
         );
@@ -169,41 +283,36 @@ export function blockToMd(
           return `<span data-affine-option data-value="${option.id}" data-option-color="${option.color}">${option.value}</span>`;
         }
 
-        const rows = Object.entries(cells)
-          .filter(([cid]) => titleById[cid])
+        const dbRows: string[][] = Object.entries(cells)
+          .filter(([cid]) => childrenTitleById[cid])
           .map(([cid, row]) => {
-            return cols
-              .map((col) => {
-                const value = row[col.id]?.value;
+            return cols.map((col) => {
+              const value = row[col.id]?.value;
 
-                if (col.type !== "title" && !value) {
-                  return "";
-                }
+              if (col.type !== "title" && !value) {
+                return "";
+              }
 
-                switch (col.type) {
-                  case "title":
-                    return titleById[cid];
-                  case "select":
-                    return optionToTagHtml(
-                      (col.data["options"] as any).find(
-                        (opt: any) => opt.id === value
-                      )
-                    );
-                  case "multi-select":
-                    return (col.data["options"] as any)
-                      .filter((opt: any) =>
-                        (value as string[]).includes(opt.id)
-                      )
-                      .map(optionToTagHtml)
-                      .join("");
-                  default:
-                    return value ?? "";
-                }
-              })
-              .map((v) => (v ? v.replace(/\n/g, "<br />") : v));
+              switch (col.type) {
+                case "title":
+                  return childrenTitleById[cid];
+                case "select":
+                  return optionToTagHtml(
+                    (col.data["options"] as any).find(
+                      (opt: any) => opt.id === value
+                    )
+                  );
+                case "multi-select":
+                  return (col.data["options"] as any)
+                    .filter((opt: any) => (value as string[]).includes(opt.id))
+                    .map(optionToTagHtml)
+                    .join("");
+                default:
+                  return value ?? "";
+              }
+            });
           })
           .filter((row) => !row.every((v) => !v));
-
         const header = cols.map((col) => {
           return col.name;
         });
@@ -213,13 +322,20 @@ export function blockToMd(
         });
 
         // convert to markdown table
-        return (
-          [header, divider, ...rows]
+        result.content =
+          [header, divider, ...dbRows]
             .map((row) => {
-              return "|" + row.join("|") + "|";
+              return "|" + row.join("|").replace(/\n/g, "<br />") + "|";
             })
-            .join("\n") + "\n\n"
-        );
+            .join("\n") + "\n\n";
+
+        Object.assign(result, {
+          title,
+          rows: dbRows.map((row) => {
+            return Object.fromEntries(row.map((v, i) => [cols[i].name, v]));
+          }),
+        });
+        break;
       }
       default: {
         console.warn("Unknown or unsupported flavour", flavour);
@@ -227,23 +343,16 @@ export function blockToMd(
     }
 
     const childrenIds = yBlock.get("sys:children");
-    if (childrenIds instanceof Y.Array) {
-      content += childrenIds
-        .map((cid: string) => {
-          return blockToMd(
-            context,
-            yBlocks.get(cid) as YBlock,
-            yBlocks,
-            resetPadding ? "" : padLeft + "  "
-          );
-        })
-        .join("");
-    }
-    return padLeft + content;
+    result.children =
+      childrenIds instanceof Y.Array && flavour !== "affine:database"
+        ? childrenIds.map((cid) =>
+            parseBlock(context, yBlocks.get(cid) as YBlock, yBlocks)
+          )
+        : [];
   } catch (e) {
     console.warn("Error converting block to md", e);
-    return "";
   }
+  return result;
 }
 
 export const workspaceDocToPagesMeta = (yDoc: Y.Doc) => {
@@ -293,7 +402,7 @@ export const workspaceDocToPagesMeta = (yDoc: Y.Doc) => {
   return pages;
 };
 
-export const pageDocToMD = (
+export const parsePageDoc = (
   workspaceId: string,
   target: string,
   pageDoc: Y.Doc,
@@ -313,16 +422,20 @@ export const pageDocToMD = (
     };
   } else {
     const yPage = yBlocks.get(maybePageBlock[0]) as YBlock;
-    const title = yPage.get("prop:title") as string;
+    const title = yPage.get("prop:title") as YText;
     const context = {
       target,
       workspaceId,
       docId: pageDoc.guid,
       blobUrlHandler,
     };
+    const rootBlock = parseBlock(context, yPage, yBlocks);
+    const md = parseBlockToMd(rootBlock);
+
     return {
-      title,
-      md: blockToMd(context, yPage, yBlocks),
+      title: title.toJSON(),
+      parsedBlock: rootBlock,
+      md,
     };
   }
 };
