@@ -9,5 +9,5 @@ export const blogReader = reader.instantiateReader({
   target:
     process.env.NODE_ENV === "development"
       ? "http://localhost:3000"
-      : "https://affine-reader-playground.vercel.app",
+      : "https://affine-reader.vercel.app/",
 });
