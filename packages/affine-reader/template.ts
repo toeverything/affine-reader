@@ -78,6 +78,8 @@ async function pageIdToSlug(pageId: string) {
   return page.slug;
 }
 
+const workspaceId = process.env.NEXT_PUBLIC_BLOG_WORKSPACE_ID;
+
 async function postprocessTemplate(
   rawTemplate: Blog.WorkspacePageContent
 ): Promise<Template | null> {
@@ -123,7 +125,7 @@ async function postprocessTemplate(
         : processed.template
       : null;
   const templateUrl = templateId
-    ? `https://app.affine.pro/template?id=${process.env.NEXT_PUBLIC_BLOG_WORKSPACE_ID}:${templateId}`
+    ? `https://app.affine.pro/template?id=${workspaceId}:${templateId}`
     : undefined;
 
   const template: Template = {
