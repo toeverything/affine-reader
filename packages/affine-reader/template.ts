@@ -8,8 +8,8 @@ export interface Template extends Blog.WorkspacePageContent {
   // New fields
   relatedTemplates: string[]; // 关联模板，元素值为 slug
   relatedBlogs: string[]; // 关联博客，元素值为 slug
-  useTemplateUrl: string; // 点击 Use this template 后跳转的链接
-  previewUrl: string; // 点击 Preview 跳换的链接
+  useTemplateUrl?: string; // 点击 Use this template 后跳转的链接
+  previewUrl?: string; // 点击 Preview 跳换的链接
 }
 
 let reader: ReturnType<typeof Blog.instantiateReader> | null = null;
@@ -122,13 +122,16 @@ async function postprocessTemplate(
         ? (processed.template as string).slice("LinkedPage:".length)
         : processed.template
       : null;
+  const templateUrl = templateId
+    ? `https://app.affine.pro/template?id=${process.env.NEXT_PUBLIC_BLOG_WORKSPACE_ID}:${templateId}`
+    : undefined;
 
   const template: Template = {
     ...processed,
     relatedTemplates: relatedTemplates.filter(Boolean) as string[],
     relatedBlogs: relatedBlogs.filter(Boolean) as string[],
-    useTemplateUrl: `https://affine.pro/template/${templateId}/use`,
-    previewUrl: `https://affine.pro/template/${templateId}/preview`,
+    useTemplateUrl: templateId ? `${templateUrl}?mode=use` : undefined,
+    previewUrl: templateId ? `${templateUrl}?mode=preview` : undefined,
   };
 
   return template;
