@@ -122,7 +122,8 @@ export function parseBlock(
   const flavour = yBlock.get("sys:flavour") as Flavour;
   const type = yBlock.get("prop:type") as string;
   const toMd = () => deltaToMd((yBlock.get("prop:text") as Y.Text).toDelta());
-
+  const hidden = yBlock.get("prop:hidden") as boolean;
+  const displayMode = yBlock.get("prop:displayMode") as string;
   let result: ParsedBlock = {
     id,
     flavour,
@@ -130,6 +131,11 @@ export function parseBlock(
     children: [],
     type,
   };
+
+  if (hidden || displayMode === "edgeless") {
+    return result;
+  }
+
   try {
     switch (flavour) {
       case "affine:paragraph": {
@@ -345,9 +351,13 @@ export function parseBlock(
     const childrenIds = yBlock.get("sys:children");
     result.children =
       childrenIds instanceof Y.Array && flavour !== "affine:database"
-        ? childrenIds.map((cid) =>
-            parseBlock(context, yBlocks.get(cid) as YBlock, yBlocks)
-          )
+        ? childrenIds
+            .map((cid) =>
+              parseBlock(context, yBlocks.get(cid) as YBlock, yBlocks)
+            )
+            .filter(
+              (block) => !(block.content === "" && block.children.length === 0)
+            )
         : [];
   } catch (e) {
     console.warn("Error converting block to md", e);
