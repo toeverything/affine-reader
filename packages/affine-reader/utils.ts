@@ -78,10 +78,17 @@ export function parseGrayMatter(
   }
 
   try {
-    const gmContent = blocks
+    let gmContent = blocks
       .slice(index, nextDividerIndex + 1)
       .map((b) => Reader.parseBlockToMd(b, ""))
       .join("\n");
+
+    // special case for linked pages
+    // replace [](LinkedPage:xxx) to LinkedPage:xxx
+    gmContent = gmContent.replaceAll(
+      /\[\]\(LinkedPage:(.*?)\)/g,
+      "LinkedPage:$1"
+    );
 
     const { data } = grayMatter(gmContent) as any;
 

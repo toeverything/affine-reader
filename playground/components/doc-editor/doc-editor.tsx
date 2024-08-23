@@ -133,6 +133,10 @@ export function DocPreviewEditor({
   const docLink = `https://app.affine.pro/workspace/${process.env.NEXT_PUBLIC_BLOG_WORKSPACE_ID}/${docId}`;
 
   useEffect(() => {
+    blogReader.getTemplateList().then((res) => {
+      console.log(res);
+    });
+
     blogReader.getDocBinary().then(setRootDoc);
     blogReader.getDocBinary(docId).then(setDoc);
   }, [docId]);

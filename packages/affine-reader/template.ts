@@ -44,12 +44,14 @@ export function instantiateReader({
 const META_LIST_NAME = "meta:template-list";
 
 function getDatabaseBlock(blocks: ParsedBlock[], title: string) {
+  const normalizedTitle = (v: string) => v.replaceAll(" ", "").toLowerCase();
+
   return findNextBlock(
     blocks,
     0,
     (block): block is DatabaseBlock =>
       block.flavour === "affine:database" &&
-      (block as DatabaseBlock).title === title
+      normalizedTitle((block as DatabaseBlock).title) === normalizedTitle(title)
   )?.[0];
 }
 
@@ -62,8 +64,9 @@ async function getLinkedPagesFromDatabase(block: DatabaseBlock) {
     return [];
   }
 
-  const pages = await reader.getLinkedPagesFromMarkdown(block.content);
-  return Promise.all(pages.map((p) => pageIdToSlug(p.id)));
+  const linkedPageIds = reader.getLinkedPageIdsFromMarkdown(block.content);
+  const pages = await reader.getRichLinkedPages(linkedPageIds);
+  return pages.map((p) => p.slug);
 }
 
 async function pageIdToSlug(pageId: string) {
@@ -113,12 +116,19 @@ async function postprocessTemplate(
     ),
   });
 
+  const templateId =
+    "template" in processed
+      ? (processed.template as string).startsWith("LinkedPage:")
+        ? (processed.template as string).slice("LinkedPage:".length)
+        : processed.template
+      : null;
+
   const template: Template = {
     ...processed,
     relatedTemplates: relatedTemplates.filter(Boolean) as string[],
     relatedBlogs: relatedBlogs.filter(Boolean) as string[],
-    useTemplateUrl: `https://affine.pro/template/${rawTemplate.id}/use`,
-    previewUrl: `https://affine.pro/template/${rawTemplate.id}/preview`,
+    useTemplateUrl: `https://affine.pro/template/${templateId}/use`,
+    previewUrl: `https://affine.pro/template/${templateId}/preview`,
   };
 
   return template;

@@ -96,7 +96,8 @@ export function instantiateReader({
     },
     parsePageDoc: parsePageDoc,
     postprocessPageContent,
-    getLinkedPagesFromMarkdown,
+    getLinkedPageIdsFromMarkdown,
+    getRichLinkedPages,
   };
 }
 
@@ -178,17 +179,16 @@ function parsePageDoc(
   return { ...docMeta, ...result, parsedBlocks: validChildren };
 }
 
-async function getLinkedPagesFromMarkdown(md: string) {
-  const linkedPagesIds = md.matchAll(/\[\]\(LinkedPage:([\w-_]*)\)/g);
+function getLinkedPageIdsFromMarkdown(md: string): string[] {
+  const linkedPageIds = md.matchAll(/\[\]\(LinkedPage:([\w-_]*)\)/g);
+  return Array.from(linkedPageIds).map(([_, id]) => id);
+}
 
-  if (!linkedPagesIds) {
-    return [];
-  }
-
+async function getRichLinkedPages(pageIds: string[]) {
   const pageMetas = await rootDocCache.value;
 
   const linkedPages = await Promise.all(
-    [...linkedPagesIds].map(async ([_, id]) => {
+    [...new Set(pageIds)].map(async (id) => {
       const page = pageMetas?.find((p) => p.id === id);
       if (!page) {
         return null;
@@ -207,9 +207,11 @@ async function postprocessPageContent(
     return content;
   }
 
+  const linkedPageIds = getLinkedPageIdsFromMarkdown(content.md);
+
   return {
     ...content,
-    linkedPages: await getLinkedPagesFromMarkdown(content.md),
+    linkedPages: await getRichLinkedPages(linkedPageIds),
   };
 }
 
