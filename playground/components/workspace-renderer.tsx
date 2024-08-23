@@ -57,6 +57,7 @@ export function WorkspaceRenderer({
         <tr>
           <th>Page</th>
           <th>Favorite</th>
+          <th>Trashed</th>
           <th>ID</th>
           <th>GUID</th>
           <th>Created At</th>
@@ -64,26 +65,25 @@ export function WorkspaceRenderer({
       </thead>
       <tbody>
         {pages
-          ? pages
-              .filter((p) => !p.trash)
-              .map((page) => (
-                <tr key={page.id}>
-                  <td>
-                    <Link
-                      className={styles.pageLink}
-                      key={page.id}
-                      href={`${template ? "/template" : ""}/${page.guid}`}
-                      passHref
-                    >
-                      {page.title}
-                    </Link>
-                  </td>
-                  <td>{page.favorite ? "✅" : ""}</td>
-                  <td>{page.id}</td>
-                  <td>{page.guid}</td>
-                  <td>{new Date(page.createDate).toLocaleString()}</td>
-                </tr>
-              ))
+          ? pages.map((page) => (
+              <tr key={page.id}>
+                <td>
+                  <Link
+                    className={styles.pageLink}
+                    key={page.id}
+                    href={`${template ? "/template" : ""}/${page.guid}`}
+                    passHref
+                  >
+                    {page.title}
+                  </Link>
+                </td>
+                <td>{page.favorite ? "✅" : ""}</td>
+                <td>{page.trash ? "✅" : ""}</td>
+                <td>{page.id}</td>
+                <td>{page.guid}</td>
+                <td>{new Date(page.createDate).toLocaleString()}</td>
+              </tr>
+            ))
           : "failed to load pages"}
       </tbody>
     </table>

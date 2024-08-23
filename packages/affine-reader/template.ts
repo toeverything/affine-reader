@@ -152,5 +152,5 @@ async function getTemplateList() {
     Boolean
   ) as Template[];
 
-  return { templates, id: page.id };
+  return { templates, templateListPageId: page.id };
 }
