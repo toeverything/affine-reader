@@ -63,8 +63,11 @@ const parseCollectionData = async (
   template?: boolean
 ) => {
   const pages = blogReader.workspaceDocToPagesMeta(rootDoc);
-  let page = blogReader.parsePageDoc(docId, doc);
-
+  const pageMeta = pages.find((p) => p.id === docId);
+  if (!pageMeta) {
+    throw new Error("Page not found");
+  }
+  let page = blogReader.parsePageDoc(pageMeta, docId, doc);
   if (!page) {
     throw new Error("Page not found");
   }
@@ -127,20 +130,30 @@ export function DocPreviewEditor({
   const [rootDoc, setRootDoc] = useState<ArrayBuffer | null>(null);
   const [doc, setDoc] = useState<ArrayBuffer | null>(null);
 
+  const docLink = `https://app.affine.pro/workspace/${process.env.NEXT_PUBLIC_BLOG_WORKSPACE_ID}/${docId}`;
+
   useEffect(() => {
     blogReader.getDocBinary().then(setRootDoc);
     blogReader.getDocBinary(docId).then(setDoc);
   }, [docId]);
 
   return (
-    rootDoc &&
-    doc && (
-      <DocPreviewEditorImpl
-        rootDocBin={rootDoc}
-        docBin={doc}
-        docId={docId}
-        template={template}
-      />
-    )
+    <>
+      <h3>Note: changes in the editor do not persist</h3>
+      <h3>
+        Edit this page at{" "}
+        <a target="_blank" href={docLink}>
+          {docId}
+        </a>
+      </h3>
+      {rootDoc && doc && (
+        <DocPreviewEditorImpl
+          rootDocBin={rootDoc}
+          docBin={doc}
+          docId={docId}
+          template={template}
+        />
+      )}
+    </>
   );
 }

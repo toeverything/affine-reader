@@ -101,6 +101,7 @@ export function instantiateReader({
 }
 
 function parsePageDoc(
+  docMeta: Reader.WorkspacePage,
   pageId: string,
   doc: Y.Doc
 ): Reader.WorkspacePageContent | null {
@@ -159,7 +160,10 @@ function parsePageDoc(
     result.cover = reader.blobUrlHandler(coverResult[0].sourceId) + ".webp";
   }
 
-  const validChildren = blocks.slice(currentIndex);
+  const validChildren = blocks.slice(currentIndex).filter((b) => {
+    // also filter out the cover
+    return b !== coverResult[0];
+  });
 
   // return the markdown (without gray matter)
   result.md = Reader.parseBlockToMd({
@@ -171,7 +175,7 @@ function parsePageDoc(
 
   // todo: there is no proper way for now to know the slug of the linked page
   // we have to parse ALL pages and let the client to handle it.
-  return { ...result, parsedBlocks: validChildren };
+  return { ...docMeta, ...result, parsedBlocks: validChildren };
 }
 
 async function getLinkedPagesFromMarkdown(md: string) {
@@ -217,11 +221,12 @@ async function getWorkspacePageContent(
   }
   const rootDoc = await rootDocCache.value;
   const rootBlock = await reader.getDoc(guid);
-  const docId = rootDoc?.find((p) => p.guid === guid)?.id;
+  const docMeta = rootDoc?.find((p) => p.guid === guid);
+  const docId = docMeta?.id;
 
-  if (!rootBlock || !docId) {
+  if (!rootBlock || !docId || !docMeta) {
     return null;
   }
 
-  return parsePageDoc(docId, rootBlock);
+  return parsePageDoc(docMeta, docId, rootBlock);
 }

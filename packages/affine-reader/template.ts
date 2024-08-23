@@ -127,28 +127,30 @@ async function postprocessTemplate(
 async function getTemplateList() {
   const doc = await reader?.getDocPageMetas();
   if (!doc) {
-    return [];
+    return null;
   }
 
   const page = doc.find((page) => page.title === META_LIST_NAME);
   if (!page) {
-    return [];
+    return null;
   }
 
   const parsed = await reader?.getWorkspacePageContent(page.id);
   if (!parsed) {
-    return [];
+    return null;
   }
 
   // page links are in order
   const pages = parsed.linkedPages;
 
   if (!pages) {
-    return [];
+    return null;
   }
 
   // postprocess (assume relatedTemplates etc are in databases)
-  const templates = await Promise.all(pages.map(postprocessTemplate));
+  const templates = (await Promise.all(pages.map(postprocessTemplate))).filter(
+    Boolean
+  ) as Template[];
 
-  return templates.filter(Boolean) as Template[];
+  return { templates, id: page.id };
 }

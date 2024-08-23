@@ -7,7 +7,7 @@ export default async function Home() {
   return (
     <main>
       <Link href={"/template"}>
-        <h3>templates</h3>
+        <h3>Click me to view the template list</h3>
       </Link>
       <WorkspaceRenderer pages={pages} />
     </main>

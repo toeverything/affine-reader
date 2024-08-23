@@ -24,7 +24,10 @@ export default function DocPreviewEditorPage({
         <h3>back home</h3>
       </Link>
 
-      <h3>Note: changes in the editor do not persist</h3>
+      <Link href={"/template"}>
+        <h3>back to template list</h3>
+      </Link>
+
       <DocPreviewEditor docId={params.docId} template />
     </main>
   );

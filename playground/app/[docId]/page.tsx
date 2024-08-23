@@ -1,24 +1,34 @@
-import Link from "next/link";
-import { PageRenderer } from "../../components";
-import { blogReader } from "@/reader";
+"use client";
 
-export default async function WorkspacePage({
+import dynamic from "next/dynamic";
+import Link from "next/link";
+
+const DocPreviewEditor = dynamic(
+  () =>
+    import("@/components/doc-editor/doc-editor").then(
+      (mod) => mod.DocPreviewEditor
+    ),
+  {
+    ssr: false,
+  }
+);
+
+export default function DocPreviewEditorPage({
   params,
 }: {
   params: { docId: string };
 }) {
-  const page = await blogReader.getWorkspacePageContent(params.docId);
   return (
     <main>
       <Link href={"/"}>
         <h3>back home</h3>
       </Link>
-      <Link href={`/${params.docId}/edit`}>
-        <h3>edit</h3>
+
+      <Link href={`/${params.docId}`}>
+        <h3>exit editor</h3>
       </Link>
-      {page && <PageRenderer page={page} />}
+
+      <DocPreviewEditor docId={params.docId} />
     </main>
   );
 }
-
-export const revalidate = 60;

@@ -26,7 +26,7 @@ export function PageRenderer({ page }: { page: WorkspacePageContent }) {
         <legend>metadata</legend>
         <pre>
           {JSON.stringify(
-            omit(page, ["md", "parsedBlocks", "linkedPages"]),
+            omit(page, ["md", "parsedBlocks", "linkedPages", "properties"]),
             null,
             2
           )}

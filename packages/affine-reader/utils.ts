@@ -79,11 +79,11 @@ export function parseGrayMatter(
 
   try {
     const gmContent = blocks
-      .slice(index + 1, nextDividerIndex)
-      .map((block) => block.content)
+      .slice(index, nextDividerIndex + 1)
+      .map((b) => Reader.parseBlockToMd(b, ""))
       .join("\n");
 
-    const { data } = grayMatter(`---\n${gmContent}\n---`) as any;
+    const { data } = grayMatter(gmContent) as any;
 
     return [
       {

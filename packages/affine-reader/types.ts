@@ -57,6 +57,6 @@ export interface WorkspacePageContent {
   updated?: number;
   md?: string;
   publish?: boolean;
-  parsedBlocks: ParsedBlock[];
+  parsedBlocks?: ParsedBlock[];
   linkedPages?: WorkspacePageContent[];
 }
