@@ -34,138 +34,138 @@ export function instantiateReader({
     target,
   });
 
+  const META_LIST_NAME = "meta:template-list";
+
+  function getDatabaseBlock(blocks: ParsedBlock[], title: string) {
+    const normalizedTitle = (v: string) => v.replaceAll(" ", "").toLowerCase();
+
+    return findNextBlock(
+      blocks,
+      0,
+      (block): block is DatabaseBlock =>
+        block.flavour === "affine:database" &&
+        normalizedTitle((block as DatabaseBlock).title) ===
+          normalizedTitle(title)
+    )?.[0];
+  }
+
+  async function getLinkedPagesFromDatabase(block: DatabaseBlock) {
+    if (!reader) {
+      throw new Error("Reader not instantiated");
+    }
+
+    if (!block) {
+      return [];
+    }
+
+    const linkedPageIds = reader.getLinkedPageIdsFromMarkdown(block.content);
+    const pages = await reader.getRichLinkedPages(linkedPageIds);
+    return pages.map((p) => p.slug);
+  }
+
+  async function pageIdToSlug(pageId: string) {
+    const page = await reader?.getWorkspacePageContent(pageId);
+    if (!page) {
+      return null;
+    }
+
+    return page.slug;
+  }
+
+  async function postprocessTemplate(
+    rawTemplate: Blog.WorkspacePageContent
+  ): Promise<Template | null> {
+    if (!reader) {
+      throw new Error("Reader not instantiated");
+    }
+
+    const processed = await reader.postprocessPageContent(rawTemplate);
+    const parsedBlocks = processed.parsedBlocks;
+    if (!parsedBlocks) {
+      return null;
+    }
+
+    const relatedTemplatesBlock = getDatabaseBlock(
+      parsedBlocks,
+      "Related Templates"
+    );
+
+    const relatedTemplates = relatedTemplatesBlock
+      ? await getLinkedPagesFromDatabase(relatedTemplatesBlock)
+      : [];
+
+    const relatedBlogsBlock = getDatabaseBlock(parsedBlocks, "Related Blogs");
+
+    const relatedBlogs = relatedBlogsBlock
+      ? await getLinkedPagesFromDatabase(relatedBlogsBlock)
+      : [];
+
+    // resulting markdown should exclude relatedTemplates and relatedBlogs
+    processed.md = parseBlockToMd({
+      id: "fake-id",
+      content: "",
+      flavour: "affine:page",
+      children: parsedBlocks.filter(
+        (block) =>
+          block !== relatedTemplatesBlock && block !== relatedBlogsBlock
+      ),
+    });
+
+    const templateId =
+      "template" in processed
+        ? (processed.template as string).startsWith("LinkedPage:")
+          ? (processed.template as string).slice("LinkedPage:".length)
+          : processed.template
+        : null;
+    const templateUrl = templateId
+      ? `https://app.affine.pro/template?id=${workspaceId}:${templateId}`
+      : undefined;
+
+    const template: Template = {
+      ...processed,
+      relatedTemplates: relatedTemplates.filter(Boolean) as string[],
+      relatedBlogs: relatedBlogs.filter(Boolean) as string[],
+      useTemplateUrl: templateId ? `${templateUrl}?mode=use` : undefined,
+      previewUrl: templateId ? `${templateUrl}?mode=preview` : undefined,
+    };
+
+    return template;
+  }
+
+  async function getTemplateList() {
+    const doc = await reader?.getDocPageMetas();
+    if (!doc) {
+      return null;
+    }
+
+    const page = doc.find((page) => page.title === META_LIST_NAME);
+    if (!page) {
+      return null;
+    }
+
+    const parsed = await reader?.getWorkspacePageContent(page.id);
+    if (!parsed) {
+      return null;
+    }
+
+    // page links are in order
+    const pages = parsed.linkedPages;
+
+    if (!pages) {
+      return null;
+    }
+
+    // postprocess (assume relatedTemplates etc are in databases)
+    const templates = (
+      await Promise.all(pages.map(postprocessTemplate))
+    ).filter(Boolean) as Template[];
+
+    return { templates, templateListPageId: page.id };
+  }
+
   return {
     ...reader,
     getTemplateList,
     postprocessTemplate,
   };
-}
-
-const META_LIST_NAME = "meta:template-list";
-
-function getDatabaseBlock(blocks: ParsedBlock[], title: string) {
-  const normalizedTitle = (v: string) => v.replaceAll(" ", "").toLowerCase();
-
-  return findNextBlock(
-    blocks,
-    0,
-    (block): block is DatabaseBlock =>
-      block.flavour === "affine:database" &&
-      normalizedTitle((block as DatabaseBlock).title) === normalizedTitle(title)
-  )?.[0];
-}
-
-async function getLinkedPagesFromDatabase(block: DatabaseBlock) {
-  if (!reader) {
-    throw new Error("Reader not instantiated");
-  }
-
-  if (!block) {
-    return [];
-  }
-
-  const linkedPageIds = reader.getLinkedPageIdsFromMarkdown(block.content);
-  const pages = await reader.getRichLinkedPages(linkedPageIds);
-  return pages.map((p) => p.slug);
-}
-
-async function pageIdToSlug(pageId: string) {
-  const page = await reader?.getWorkspacePageContent(pageId);
-  if (!page) {
-    return null;
-  }
-
-  return page.slug;
-}
-
-const workspaceId = process.env.NEXT_PUBLIC_BLOG_WORKSPACE_ID;
-
-async function postprocessTemplate(
-  rawTemplate: Blog.WorkspacePageContent
-): Promise<Template | null> {
-  if (!reader) {
-    throw new Error("Reader not instantiated");
-  }
-
-  const processed = await reader.postprocessPageContent(rawTemplate);
-  const parsedBlocks = processed.parsedBlocks;
-  if (!parsedBlocks) {
-    return null;
-  }
-
-  const relatedTemplatesBlock = getDatabaseBlock(
-    parsedBlocks,
-    "Related Templates"
-  );
-
-  const relatedTemplates = relatedTemplatesBlock
-    ? await getLinkedPagesFromDatabase(relatedTemplatesBlock)
-    : [];
-
-  const relatedBlogsBlock = getDatabaseBlock(parsedBlocks, "Related Blogs");
-
-  const relatedBlogs = relatedBlogsBlock
-    ? await getLinkedPagesFromDatabase(relatedBlogsBlock)
-    : [];
-
-  // resulting markdown should exclude relatedTemplates and relatedBlogs
-  processed.md = parseBlockToMd({
-    id: "fake-id",
-    content: "",
-    flavour: "affine:page",
-    children: parsedBlocks.filter(
-      (block) => block !== relatedTemplatesBlock && block !== relatedBlogsBlock
-    ),
-  });
-
-  const templateId =
-    "template" in processed
-      ? (processed.template as string).startsWith("LinkedPage:")
-        ? (processed.template as string).slice("LinkedPage:".length)
-        : processed.template
-      : null;
-  const templateUrl = templateId
-    ? `https://app.affine.pro/template?id=${workspaceId}:${templateId}`
-    : undefined;
-
-  const template: Template = {
-    ...processed,
-    relatedTemplates: relatedTemplates.filter(Boolean) as string[],
-    relatedBlogs: relatedBlogs.filter(Boolean) as string[],
-    useTemplateUrl: templateId ? `${templateUrl}?mode=use` : undefined,
-    previewUrl: templateId ? `${templateUrl}?mode=preview` : undefined,
-  };
-
-  return template;
-}
-
-async function getTemplateList() {
-  const doc = await reader?.getDocPageMetas();
-  if (!doc) {
-    return null;
-  }
-
-  const page = doc.find((page) => page.title === META_LIST_NAME);
-  if (!page) {
-    return null;
-  }
-
-  const parsed = await reader?.getWorkspacePageContent(page.id);
-  if (!parsed) {
-    return null;
-  }
-
-  // page links are in order
-  const pages = parsed.linkedPages;
-
-  if (!pages) {
-    return null;
-  }
-
-  // postprocess (assume relatedTemplates etc are in databases)
-  const templates = (await Promise.all(pages.map(postprocessTemplate))).filter(
-    Boolean
-  ) as Template[];
-
-  return { templates, templateListPageId: page.id };
 }
