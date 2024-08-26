@@ -34,6 +34,8 @@ export function instantiateReader({
     target,
   });
 
+  const _reader = reader;
+
   const META_LIST_NAME = "meta:template-list";
 
   function getDatabaseBlock(blocks: ParsedBlock[], title: string) {
@@ -50,21 +52,17 @@ export function instantiateReader({
   }
 
   async function getLinkedPagesFromDatabase(block: DatabaseBlock) {
-    if (!reader) {
-      throw new Error("Reader not instantiated");
-    }
-
     if (!block) {
       return [];
     }
 
-    const linkedPageIds = reader.getLinkedPageIdsFromMarkdown(block.content);
-    const pages = await reader.getRichLinkedPages(linkedPageIds);
+    const linkedPageIds = _reader.getLinkedPageIdsFromMarkdown(block.content);
+    const pages = await _reader.getRichLinkedPages(linkedPageIds);
     return pages.map((p) => p.slug);
   }
 
   async function pageIdToSlug(pageId: string) {
-    const page = await reader?.getWorkspacePageContent(pageId);
+    const page = await _reader?.getWorkspacePageContent(pageId);
     if (!page) {
       return null;
     }
@@ -75,11 +73,7 @@ export function instantiateReader({
   async function postprocessTemplate(
     rawTemplate: Blog.WorkspacePageContent
   ): Promise<Template | null> {
-    if (!reader) {
-      throw new Error("Reader not instantiated");
-    }
-
-    const processed = await reader.postprocessPageContent(rawTemplate);
+    const processed = await _reader.postprocessPageContent(rawTemplate);
     const parsedBlocks = processed.parsedBlocks;
     if (!parsedBlocks) {
       return null;
@@ -132,7 +126,14 @@ export function instantiateReader({
     return template;
   }
 
-  async function getTemplateList() {
+  async function getTemplateList(): Promise<{
+    categories: {
+      category: string;
+      list: Template[];
+      featured: Template;
+    }[];
+    templateListPageId: string;
+  } | null> {
     const doc = await reader?.getDocPageMetas();
     if (!doc) {
       return null;
@@ -148,19 +149,52 @@ export function instantiateReader({
       return null;
     }
 
-    // page links are in order
-    const pages = parsed.linkedPages;
+    // get all database blocks
+    const databaseBlocks = parsed.parsedBlocks?.filter(
+      (block): block is DatabaseBlock => block.flavour === "affine:database"
+    );
 
-    if (!pages) {
+    if (!databaseBlocks) {
       return null;
     }
 
-    // postprocess (assume relatedTemplates etc are in databases)
-    const templates = (
-      await Promise.all(pages.map(postprocessTemplate))
-    ).filter(Boolean) as Template[];
+    // id -> template
+    const cache = new Map<string, Template>();
 
-    return { templates, templateListPageId: page.id };
+    // database title is the category
+    const parseDatabase = async (block: DatabaseBlock) => {
+      const templates: Template[] = [];
+
+      for (const id of _reader.getLinkedPageIdsFromMarkdown(block.content)) {
+        if (cache.has(id)) {
+          templates.push(cache.get(id)!);
+          continue;
+        }
+
+        const page = await _reader.getWorkspacePageContent(id);
+        if (!page) {
+          continue;
+        }
+        const template = await postprocessTemplate(page);
+        if (template) {
+          templates.push(template);
+          cache.set(id, template);
+        }
+      }
+
+      return {
+        category: block.title,
+        list: templates,
+        featured: templates[0],
+      };
+    };
+
+    const categories = await Promise.all(databaseBlocks.map(parseDatabase));
+
+    return {
+      categories,
+      templateListPageId: page.id,
+    };
   }
 
   return {

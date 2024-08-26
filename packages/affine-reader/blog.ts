@@ -83,6 +83,7 @@ export function instantiateReader({
   return {
     ...reader,
     workspaceId,
+    // todo: there is no way to know which page is the blog page by reading workspace page metas yet
     getDocPageMetas: () => rootDocCache.value,
     getWorkspacePageContent: async (
       id: string,

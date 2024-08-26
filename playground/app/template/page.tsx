@@ -9,13 +9,8 @@ export default async function TemplatePages() {
   if (!templateList) {
     return <div>No template list file found</div>;
   }
-  const { templates, templateListPageId } = templateList;
 
-  const workspacePages = templates
-    .map((t) => {
-      return pages?.find((p) => p.id === t.id);
-    })
-    .filter((p): p is WorkspacePage => p !== undefined);
+  const { categories, templateListPageId } = templateList;
 
   const templateListLink = `https://app.affine.pro/workspace/${process.env.NEXT_PUBLIC_BLOG_WORKSPACE_ID}/${templateList.templateListPageId}`;
   return (
@@ -33,7 +28,19 @@ export default async function TemplatePages() {
         The list should have the same order as the templates defined in the
         template list file.
       </section>
-      <WorkspaceRenderer template pages={workspacePages} />
+      {categories.map((category) => (
+        <div key={category.category}>
+          <h3>{category.category}</h3>
+          <WorkspaceRenderer
+            template
+            pages={category.list
+              .map((t) => {
+                return pages?.find((p) => p.id === t.id);
+              })
+              .filter((p): p is WorkspacePage => p !== undefined)}
+          />
+        </div>
+      ))}
     </main>
   );
 }
