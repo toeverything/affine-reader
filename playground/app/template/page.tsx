@@ -29,8 +29,13 @@ export default async function TemplatePages() {
         template list file.
       </section>
       {categories.map((category) => (
-        <div key={category.category}>
-          <h3>{category.category}</h3>
+        <fieldset
+          key={category.category}
+          style={{
+            padding: 16,
+          }}
+        >
+          <legend>{category.category}</legend>
           <WorkspaceRenderer
             template
             pages={category.list
@@ -43,7 +48,7 @@ export default async function TemplatePages() {
             <code>{category.description}</code>
           </pre>
           <hr />
-        </div>
+        </fieldset>
       ))}
     </main>
   );

@@ -71,6 +71,11 @@ export interface EmbedLinkedDocBlock extends BaseParsedBlock {
   pageId: string;
 }
 
+export interface EmbedSyncedDocBlock extends BaseParsedBlock {
+  flavour: "affine:embed-synced-doc";
+  pageId: string;
+}
+
 export interface DatabaseBlock extends BaseParsedBlock {
   title: string;
   flavour: "affine:database";
