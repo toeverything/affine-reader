@@ -20,6 +20,7 @@ export type Flavour = BaseFlavour<
   | "bookmark"
   | "embed-youtube"
   | "embed-linked-doc"
+  | "embed-synced-doc"
 >;
 
 export interface WorkspacePage {

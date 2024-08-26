@@ -6,22 +6,22 @@ import { WorkspacePageContent } from "./index";
 export function findNextBlock<T extends Reader.ParsedBlock>(
   blocks: Reader.ParsedBlock[],
   index: number,
-  predicate: (block: Reader.ParsedBlock) => block is T
+  predicate: (block: Reader.ParsedBlock, index: number) => block is T
 ): [T | null, number];
 
 export function findNextBlock(
   blocks: Reader.ParsedBlock[],
   index: number,
-  predicate: (block: Reader.ParsedBlock) => boolean
+  predicate: (block: Reader.ParsedBlock, index: number) => boolean
 ): [Reader.ParsedBlock | null, number];
 
 export function findNextBlock(
   blocks: Reader.ParsedBlock[],
   index: number,
-  predicate: (block: Reader.ParsedBlock) => boolean
+  predicate: (block: Reader.ParsedBlock, index: number) => boolean
 ): [Reader.ParsedBlock | null, number] {
   for (let i = index; i < blocks.length; i++) {
-    if (predicate(blocks[i])) {
+    if (predicate(blocks[i], i)) {
       return [blocks[i], i];
     }
   }

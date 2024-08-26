@@ -39,6 +39,10 @@ export default async function TemplatePages() {
               })
               .filter((p): p is WorkspacePage => p !== undefined)}
           />
+          <pre>
+            <code>{category.description}</code>
+          </pre>
+          <hr />
         </div>
       ))}
     </main>

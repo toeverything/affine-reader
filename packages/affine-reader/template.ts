@@ -1,8 +1,13 @@
 // template right now is a superset of blog site
 
 import * as Blog from "./blog";
-import { DatabaseBlock, parseBlockToMd, ParsedBlock } from "./parser";
-import { findNextBlock } from "./utils";
+import {
+  DatabaseBlock,
+  EmbedSyncedDocBlock,
+  parseBlockToMd,
+  ParsedBlock,
+} from "./parser";
+import { findNextBlock, skipEmptyBlocks } from "./utils";
 
 export interface Template extends Blog.WorkspacePageContent {
   // New fields
@@ -10,6 +15,13 @@ export interface Template extends Blog.WorkspacePageContent {
   relatedBlogs: string[]; // 关联博客，元素值为 slug
   useTemplateUrl?: string; // 点击 Use this template 后跳转的链接
   previewUrl?: string; // 点击 Preview 跳换的链接
+}
+
+export interface TemplateCategory {
+  category: string;
+  list: Template[];
+  featured: Template;
+  description: string; // 模板列表页面的描述, Markdown格式
 }
 
 let reader: ReturnType<typeof Blog.instantiateReader> | null = null;
@@ -49,6 +61,22 @@ export function instantiateReader({
         normalizedTitle((block as DatabaseBlock).title) ===
           normalizedTitle(title)
     )?.[0];
+  }
+
+  async function getCategoryDescription(blocks: ParsedBlock[], index: number) {
+    // find 'embed-synced-doc' after index
+    const block = skipEmptyBlocks(blocks, index + 1)[0] as EmbedSyncedDocBlock;
+
+    if (!block || block.flavour !== "affine:embed-synced-doc") {
+      return "";
+    }
+
+    const page = await _reader.getWorkspacePageContent(block.pageId);
+    if (!page) {
+      return "";
+    }
+
+    return page.md || "";
   }
 
   async function getLinkedPagesFromDatabase(block: DatabaseBlock) {
@@ -145,11 +173,7 @@ export function instantiateReader({
   }
 
   async function getTemplateList(): Promise<{
-    categories: {
-      category: string;
-      list: Template[];
-      featured: Template;
-    }[];
+    categories: TemplateCategory[];
     templateListPageId: string;
   } | null> {
     const doc = await reader?.getDocPageMetas();
@@ -164,6 +188,12 @@ export function instantiateReader({
 
     const parsed = await reader?.getWorkspacePageContent(page.id);
     if (!parsed) {
+      return null;
+    }
+
+    const parsedBlocks = parsed.parsedBlocks;
+
+    if (!parsedBlocks) {
       return null;
     }
 
@@ -207,7 +237,18 @@ export function instantiateReader({
       };
     };
 
-    const categories = await Promise.all(databaseBlocks.map(parseDatabase));
+    const categories: TemplateCategory[] = [];
+
+    for (let i = 0; i < parsedBlocks.length; i++) {
+      const block = parsedBlocks[i];
+      if (block.flavour === "affine:database") {
+        const category = await parseDatabase(block as DatabaseBlock);
+        categories.push({
+          ...category,
+          description: await getCategoryDescription(parsedBlocks, i),
+        });
+      }
+    }
 
     return {
       categories,

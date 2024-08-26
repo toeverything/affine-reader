@@ -255,7 +255,8 @@ export function parseBlock(
         });
         break;
       }
-      case "affine:embed-linked-doc": {
+      case "affine:embed-linked-doc":
+      case "affine:embed-synced-doc": {
         const pageId = yBlock.get("prop:pageId") as string;
         result.content = `\n[](LinkedPage:${pageId})\n\n`;
         Object.assign(result, {
