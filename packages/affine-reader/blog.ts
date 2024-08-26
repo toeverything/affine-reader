@@ -102,6 +102,12 @@ export function instantiateReader({
   };
 }
 
+function isValidPage(page: Reader.WorkspacePageContent) {
+  return Boolean(
+    page.title && page.md && page.id && page.slug && page.cover && page.created
+  );
+}
+
 function parsePageDoc(
   docMeta: Reader.WorkspacePage,
   pageId: string,
@@ -159,7 +165,10 @@ function parsePageDoc(
   );
 
   if (coverResult[0]) {
-    result.cover = reader.blobUrlHandler(coverResult[0].sourceId) + ".webp";
+    result.cover = {
+      url: reader.blobUrlHandler(coverResult[0].sourceId) + ".webp",
+      alt: coverResult[0].caption?.trim(),
+    };
   }
 
   const validChildren = blocks.slice(currentIndex).filter((b) => {
@@ -175,9 +184,15 @@ function parsePageDoc(
     children: validChildren,
   });
 
-  // todo: there is no proper way for now to know the slug of the linked page
-  // we have to parse ALL pages and let the client to handle it.
-  return { ...docMeta, ...result, parsedBlocks: validChildren };
+  // @ts-ignore
+  delete docMeta["tags"];
+
+  const parsedDoc = { ...docMeta, ...result, parsedBlocks: validChildren };
+
+  return {
+    ...parsedDoc,
+    valid: isValidPage(parsedDoc),
+  };
 }
 
 function getLinkedPageIdsFromMarkdown(md: string): string[] {

@@ -51,7 +51,10 @@ export interface WorkspacePageContent {
   id: string;
   slug?: string;
   ["slug-alt"]?: string;
-  cover?: string;
+  cover?: {
+    url: string;
+    alt?: string;
+  };
   description?: string;
   created?: number;
   updated?: number;
@@ -59,4 +62,5 @@ export interface WorkspacePageContent {
   publish?: boolean;
   parsedBlocks?: ParsedBlock[];
   linkedPages?: WorkspacePageContent[];
+  valid?: boolean;
 }

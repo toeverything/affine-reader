@@ -123,7 +123,25 @@ export function instantiateReader({
       previewUrl: templateId ? `${templateUrl}?mode=preview` : undefined,
     };
 
-    return template;
+    return {
+      ...template,
+      valid: isValidTemplate(template),
+    };
+  }
+
+  function isValidTemplate(template: Template) {
+    return Boolean(
+      template.title &&
+        template.cover &&
+        template.md &&
+        template.id &&
+        template.slug &&
+        template.parsedBlocks &&
+        template.relatedTemplates &&
+        template.relatedBlogs &&
+        template.useTemplateUrl &&
+        template.previewUrl
+    );
   }
 
   async function getTemplateList(): Promise<{

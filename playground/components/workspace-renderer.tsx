@@ -30,6 +30,9 @@ export function PageRenderer({ page }: { page: WorkspacePageContent }) {
             null,
             2
           )}
+          <h3 style={{ color: page.valid ? "green" : "red" }}>
+            {page.valid ? "valid" : "invalid"}
+          </h3>
         </pre>
       </section>
       <section className={styles.twoColumnWrapper}>
