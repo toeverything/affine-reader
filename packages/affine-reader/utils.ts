@@ -1,4 +1,4 @@
-import grayMatter from "gray-matter";
+import fm from "front-matter";
 
 import * as Reader from "./index";
 import { WorkspacePageContent } from "./index";
@@ -90,13 +90,13 @@ export function parseGrayMatter(
       "LinkedPage:$1"
     );
 
-    const { data } = grayMatter(gmContent) as any;
+    const { attributes } = fm(gmContent) as any;
 
     return [
       {
-        ...data,
-        tags: data.tags?.split(",").map((tag: string) => tag.trim()),
-        authors: data.authors
+        ...attributes,
+        tags: attributes.tags?.split(",").map((tag: string) => tag.trim()),
+        authors: attributes.authors
           ?.split(",")
           .map((author: string) => author.trim()),
       },
