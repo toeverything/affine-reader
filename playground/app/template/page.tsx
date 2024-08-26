@@ -44,7 +44,11 @@ export default async function TemplatePages() {
               })
               .filter((p): p is WorkspacePage => p !== undefined)}
           />
-          <pre>
+          <pre
+            style={{
+              whiteSpace: "pre-wrap",
+            }}
+          >
             <code>{category.description}</code>
           </pre>
           <hr />
