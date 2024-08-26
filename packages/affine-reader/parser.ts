@@ -124,6 +124,11 @@ export function parseBlock(
   const toMd = () => deltaToMd((yBlock.get("prop:text") as Y.Text).toDelta());
   const hidden = yBlock.get("prop:hidden") as boolean;
   const displayMode = yBlock.get("prop:displayMode") as string;
+  const childrenIds =
+    yBlock.get("sys:children") instanceof Y.Array
+      ? (yBlock.get("sys:children") as Y.Array<string>).toJSON()
+      : [];
+
   let result: ParsedBlock = {
     id,
     flavour,
@@ -268,7 +273,7 @@ export function parseBlock(
       case "affine:database": {
         const title = (yBlock.get("prop:title") as YText).toJSON();
         const childrenTitleById = Object.fromEntries(
-          (yBlock.get("sys:children") as Y.Array<string>).map((cid) => {
+          childrenIds.map((cid) => {
             return [
               cid,
               parseBlockToMd(
@@ -289,11 +294,11 @@ export function parseBlock(
           return `<span data-affine-option data-value="${option.id}" data-option-color="${option.color}">${option.value}</span>`;
         }
 
-        const dbRows: string[][] = Object.entries(cells)
-          .filter(([cid]) => childrenTitleById[cid])
-          .map(([cid, row]) => {
+        const dbRows: string[][] = childrenIds
+          .map((cid, index) => {
+            const row = cells[index];
             return cols.map((col) => {
-              const value = row[col.id]?.value;
+              const value = row?.[col.id]?.value;
 
               if (col.type !== "title" && !value) {
                 return "";
@@ -348,9 +353,8 @@ export function parseBlock(
       }
     }
 
-    const childrenIds = yBlock.get("sys:children");
     result.children =
-      childrenIds instanceof Y.Array && flavour !== "affine:database"
+      flavour !== "affine:database"
         ? childrenIds
             .map((cid) =>
               parseBlock(context, yBlocks.get(cid) as YBlock, yBlocks)
