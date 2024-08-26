@@ -51,10 +51,8 @@ export interface WorkspacePageContent {
   id: string;
   slug?: string;
   ["slug-alt"]?: string;
-  cover?: {
-    url: string;
-    alt?: string;
-  };
+  cover?: string;
+  coverAlt?: string;
   description?: string;
   created?: number;
   updated?: number;

@@ -165,10 +165,8 @@ function parsePageDoc(
   );
 
   if (coverResult[0]) {
-    result.cover = {
-      url: reader.blobUrlHandler(coverResult[0].sourceId) + ".webp",
-      alt: coverResult[0].caption?.trim(),
-    };
+    result.cover = reader.blobUrlHandler(coverResult[0].sourceId) + ".webp";
+    result.coverAlt = coverResult[0].caption?.trim();
   }
 
   const validChildren = blocks.slice(currentIndex).filter((b) => {

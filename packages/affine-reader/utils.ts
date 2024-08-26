@@ -35,7 +35,10 @@ export function skipEmptyBlocks(
   return findNextBlock(blocks, index, (block) => block.content.trim() !== "");
 }
 
-export function isDivider(block: Reader.ParsedBlock): boolean {
+export function isDivider(block?: Reader.ParsedBlock): boolean {
+  if (!block) {
+    return false;
+  }
   return (
     block.flavour === "affine:divider" ||
     (block.flavour === "affine:paragraph" &&
@@ -67,7 +70,7 @@ export function parseGrayMatter(
   >,
   number
 ] {
-  if (!isDivider(blocks[index])) {
+  if (!isDivider(blocks.at(index))) {
     return [null, index];
   }
 
