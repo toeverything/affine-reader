@@ -99,6 +99,10 @@ function DocPreviewEditorImpl({
 
   useEffect(() => {
     let canceled = false;
+    blogReader.getTemplateList().then((res) => {
+      console.log(res);
+    });
+
     parseCollectionData(collection.doc, doc.spaceDoc, docId, template).then(
       ({ page }) => {
         if (canceled) return;
@@ -133,10 +137,6 @@ export function DocPreviewEditor({
   const docLink = `https://app.affine.pro/workspace/${process.env.NEXT_PUBLIC_BLOG_WORKSPACE_ID}/${docId}`;
 
   useEffect(() => {
-    blogReader.getTemplateList().then((res) => {
-      console.log(res);
-    });
-
     blogReader.getDocBinary().then(setRootDoc);
     blogReader.getDocBinary(docId).then(setDoc);
   }, [docId]);

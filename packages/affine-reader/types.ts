@@ -54,6 +54,8 @@ export interface WorkspacePageContent {
   ["slug-alt"]?: string;
   cover?: string;
   coverAlt?: string;
+  thumbnail?: string;
+  thumbnailAlt?: string;
   description?: string;
   created?: number;
   updated?: number;

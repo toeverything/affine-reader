@@ -24,12 +24,19 @@ export function PageRenderer({ page }: { page: WorkspacePageContent }) {
     <div>
       <section>
         <legend>metadata</legend>
-        <pre>
-          {JSON.stringify(
-            omit(page, ["md", "parsedBlocks", "linkedPages", "properties"]),
-            null,
-            2
-          )}
+        <pre
+          style={{
+            whiteSpace: "pre-wrap",
+          }}
+        >
+          <code>
+            {JSON.stringify(
+              omit(page, ["md", "parsedBlocks", "linkedPages", "properties"]),
+              null,
+              2
+            )}
+          </code>
+
           <h3 style={{ color: page.valid ? "green" : "red" }}>
             {page.valid ? "valid" : "invalid"}
           </h3>

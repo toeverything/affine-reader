@@ -158,20 +158,37 @@ function parsePageDoc(
   currentIndex = gmResult[1];
 
   // first image block is the cover
-  const coverResult = findNextBlock(
+  const [coverBlock, coverBlockIndex] = findNextBlock(
     blocks,
     currentIndex,
     (block): block is Reader.ImageBlock => block.flavour === "affine:image"
   );
 
-  if (coverResult[0]) {
-    result.cover = reader.blobUrlHandler(coverResult[0].sourceId) + ".webp";
-    result.coverAlt = coverResult[0].caption?.trim();
+  if (coverBlock) {
+    result.cover = reader.blobUrlHandler(coverBlock.sourceId) + ".webp";
+    result.coverAlt = coverBlock.caption?.trim();
+  }
+
+  let thumbnailBlock: Reader.ImageBlock | null = null;
+  let thumbnailBlockIndex: number | null = null;
+
+  if (coverBlock) {
+    [thumbnailBlock, thumbnailBlockIndex] = findNextBlock(
+      blocks,
+      coverBlockIndex + 1,
+      (block): block is Reader.ImageBlock => block.flavour === "affine:image"
+    );
+
+    if (thumbnailBlock) {
+      result.thumbnail =
+        reader.blobUrlHandler(thumbnailBlock.sourceId) + ".webp";
+      result.thumbnailAlt = thumbnailBlock.caption?.trim();
+    }
   }
 
   const validChildren = blocks.slice(currentIndex).filter((b) => {
     // also filter out the cover
-    return b !== coverResult[0];
+    return b !== coverBlock && b !== thumbnailBlock;
   });
 
   // return the markdown (without gray matter)

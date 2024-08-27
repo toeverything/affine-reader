@@ -67,7 +67,11 @@ export function instantiateReader({
     // find 'embed-synced-doc' after index
     const block = skipEmptyBlocks(blocks, index + 1)[0] as EmbedSyncedDocBlock;
 
-    if (!block || block.flavour !== "affine:embed-synced-doc") {
+    if (
+      !block ||
+      (block.flavour !== "affine:embed-synced-doc" &&
+        block.flavour !== "affine:embed-linked-doc")
+    ) {
       return "";
     }
 
