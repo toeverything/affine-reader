@@ -106,6 +106,7 @@ export function instantiateReader({
     rawTemplate: Blog.WorkspacePageContent
   ): Promise<Template | null> {
     const processed = await _reader.postprocessPageContent(rawTemplate);
+    const docs = await _reader.getDocPageMetas();
     const parsedBlocks = processed.parsedBlocks;
     if (!parsedBlocks) {
       return null;
@@ -143,16 +144,37 @@ export function instantiateReader({
           ? (processed.template as string).slice("LinkedPage:".length)
           : processed.template
         : null;
-    const templateUrl = templateId
-      ? `https://app.affine.pro/template?id=${workspaceId}:${templateId}`
-      : undefined;
+
+    const templateParams = (() => {
+      if (!templateId) {
+        return undefined;
+      }
+
+      // templateId -> pageId
+      const doc = docs?.find((doc) => doc.guid === templateId);
+      if (!doc) {
+        return undefined;
+      }
+
+      const params = new URLSearchParams();
+      params.set("workspaceId", workspaceId);
+      params.set("pageId", doc.id);
+      params.set("name", processed.title || doc.title);
+
+      const previewUrl = `https://app.affine.pro/template/preview?${params.toString()}`;
+      const useTemplateUrl = `https://app.affine.pro/template/import?${params.toString()}`;
+
+      return {
+        previewUrl,
+        useTemplateUrl,
+      };
+    })();
 
     const template: Template = {
       ...processed,
+      ...templateParams,
       relatedTemplates: relatedTemplates.filter(Boolean) as string[],
       relatedBlogs: relatedBlogs.filter(Boolean) as string[],
-      useTemplateUrl: templateId ? `${templateUrl}?mode=use` : undefined,
-      previewUrl: templateId ? `${templateUrl}?mode=preview` : undefined,
     };
 
     return {
