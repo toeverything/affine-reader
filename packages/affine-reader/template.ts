@@ -19,6 +19,8 @@ export interface Template extends Blog.WorkspacePageContent {
 
 export interface TemplateCategory {
   category: string;
+  title: string;
+  slug: string;
   list: Template[];
   featured: Template;
   description: string; // 模板列表页面的描述, Markdown格式
@@ -72,15 +74,24 @@ export function instantiateReader({
       (block.flavour !== "affine:embed-synced-doc" &&
         block.flavour !== "affine:embed-linked-doc")
     ) {
-      return "";
+      return {
+        md: "",
+        title: "",
+      };
     }
 
     const page = await _reader.getWorkspacePageContent(block.pageId);
     if (!page) {
-      return "";
+      return {
+        md: "",
+        title: "",
+      };
     }
 
-    return page.md || "";
+    return {
+      md: page.md || "",
+      title: page.title || "",
+    };
   }
 
   async function getLinkedPagesFromDatabase(block: DatabaseBlock) {
@@ -269,9 +280,12 @@ export function instantiateReader({
       const block = parsedBlocks[i];
       if (block.flavour === "affine:database") {
         const category = await parseDatabase(block as DatabaseBlock);
+        const description = await getCategoryDescription(parsedBlocks, i);
         categories.push({
           ...category,
-          description: await getCategoryDescription(parsedBlocks, i),
+          title: description.title,
+          description: description.md,
+          slug: category.category.toLocaleLowerCase().replaceAll(" ", "-"),
         });
       }
     }
