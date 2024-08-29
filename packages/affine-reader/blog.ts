@@ -170,16 +170,11 @@ function parsePageDoc(
   }
 
   let thumbnailBlock: Reader.ImageBlock | null = null;
-  let thumbnailBlockIndex: number | null = null;
 
   if (coverBlock) {
-    [thumbnailBlock, thumbnailBlockIndex] = findNextBlock(
-      blocks,
-      coverBlockIndex + 1,
-      (block): block is Reader.ImageBlock => block.flavour === "affine:image"
-    );
-
-    if (thumbnailBlock) {
+    const [block] = skipEmptyBlocks(blocks, coverBlockIndex + 1);
+    if (block && block.flavour === "affine:image") {
+      thumbnailBlock = block as Reader.ImageBlock;
       result.thumbnail =
         reader.blobUrlHandler(thumbnailBlock.sourceId) + ".webp";
       result.thumbnailAlt = thumbnailBlock.caption?.trim();

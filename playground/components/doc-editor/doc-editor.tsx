@@ -131,14 +131,25 @@ export function DocPreviewEditor({
   docId: string;
   template?: boolean;
 }) {
-  const [rootDoc, setRootDoc] = useState<ArrayBuffer | null>(null);
-  const [doc, setDoc] = useState<ArrayBuffer | null>(null);
+  const [rootDocBin, setRootDocBin] = useState<ArrayBuffer | null>(null);
+  const [docBin, setDocBin] = useState<ArrayBuffer | null>(null);
 
   const docLink = `https://app.affine.pro/workspace/${process.env.NEXT_PUBLIC_BLOG_WORKSPACE_ID}/${docId}`;
 
   useEffect(() => {
-    blogReader.getDocBinary().then(setRootDoc);
-    blogReader.getDocBinary(docId).then(setDoc);
+    blogReader.getDocBinary().then((rootDoc) => {
+      if (!rootDoc) {
+        return;
+      }
+      setRootDocBin(rootDoc);
+      const ydoc = new Y.Doc();
+      Y.applyUpdate(ydoc, new Uint8Array(rootDoc));
+      const subdoc = ydoc.getMap("spaces").get(docId) as Y.Doc;
+      if (!subdoc) {
+        return;
+      }
+      blogReader.getDocBinary(subdoc.guid).then((doc) => setDocBin(doc));
+    });
   }, [docId]);
 
   return (
@@ -150,10 +161,10 @@ export function DocPreviewEditor({
           {docId}
         </a>
       </h3>
-      {rootDoc && doc && (
+      {rootDocBin && docBin && (
         <DocPreviewEditorImpl
-          rootDocBin={rootDoc}
-          docBin={doc}
+          rootDocBin={rootDocBin}
+          docBin={docBin}
           docId={docId}
           template={template}
         />

@@ -81,10 +81,10 @@ export function WorkspaceRenderer({
                   <Link
                     className={styles.pageLink}
                     key={page.id}
-                    href={`${template ? "/template" : ""}/${page.guid}`}
+                    href={`${template ? "/template" : ""}/${page.id}`}
                     passHref
                   >
-                    {page.title}
+                    {page.title || page.id}
                   </Link>
                 </td>
                 <td>{page.favorite ? "✅" : ""}</td>
