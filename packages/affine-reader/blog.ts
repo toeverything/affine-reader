@@ -165,7 +165,7 @@ function parsePageDoc(
   );
 
   if (coverBlock) {
-    result.cover = reader.blobUrlHandler(coverBlock.sourceId) + ".webp";
+    result.cover = reader.blobUrlHandler(coverBlock.sourceId);
     result.coverAlt = coverBlock.caption?.trim();
   }
 
@@ -175,8 +175,7 @@ function parsePageDoc(
     const [block] = skipEmptyBlocks(blocks, coverBlockIndex + 1);
     if (block && block.flavour === "affine:image") {
       thumbnailBlock = block as Reader.ImageBlock;
-      result.thumbnail =
-        reader.blobUrlHandler(thumbnailBlock.sourceId) + ".webp";
+      result.thumbnail = reader.blobUrlHandler(thumbnailBlock.sourceId);
       result.thumbnailAlt = thumbnailBlock.caption?.trim();
     }
   }

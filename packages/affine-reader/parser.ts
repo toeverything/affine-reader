@@ -192,7 +192,7 @@ export function parseBlock(
         const width = yBlock.get("prop:width");
         const height = yBlock.get("prop:height");
         // fixme: this may not work if workspace is not public
-        const blobUrl = context.blobUrlHandler(sourceId) + ".webp";
+        const blobUrl = context.blobUrlHandler(sourceId);
         const caption = yBlock.get("prop:caption") as string;
         if (width || height || caption) {
           result.content = html`
