@@ -7,5 +7,5 @@ build({
   outdir: "dist",
   sourcemap: true,
   format: "esm",
-  external: ["yjs"],
+  external: ["yjs", "@blocksuite/*"],
 });
