@@ -1,4 +1,4 @@
-import { blogReader } from "@/reader";
+import { reader } from "@/reader";
 import { AffineSchemas } from "@blocksuite/blocks";
 import { AffineEditorContainer } from "@blocksuite/presets";
 import "@blocksuite/presets/themes/affine.css";
@@ -19,7 +19,7 @@ export function initEditor(
   docBin: ArrayBuffer
 ) {
   const schema = new Schema().register(AffineSchemas);
-  const workspaceId = blogReader.workspaceId;
+  const workspaceId = reader.workspaceId;
   const collection = new DocCollection({
     schema,
     blobSources: {

@@ -1,5 +1,6 @@
 import * as Y from "yjs";
 import { parsePageDoc, workspaceDocToPagesMeta } from "./parser";
+import { getDocSnapshotFromBin } from "./snapshot";
 
 interface ReaderConfig {
   workspaceId: string; // root workspace id
@@ -163,5 +164,12 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
       return parsePageDoc(workspaceId, target, doc, blobUrlHandler);
     },
     workspaceDocToPagesMeta,
+    getDocSnapshot: async (docId: string) => {
+      const docBin = await getDocBinary(docId);
+      if (!docBin) {
+        return null;
+      }
+      return getDocSnapshotFromBin(docId, docBin);
+    },
   };
 };

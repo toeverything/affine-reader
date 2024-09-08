@@ -15,6 +15,7 @@ export interface Template extends Blog.WorkspacePageContent {
   relatedBlogs: string[]; // 关联博客，元素值为 slug
   useTemplateUrl?: string; // 点击 Use this template 后跳转的链接
   previewUrl?: string; // 点击 Preview 跳换的链接
+  templateId?: string; // 模板的 id
 }
 
 export interface TemplateCategory {
@@ -178,6 +179,7 @@ export function instantiateReader({
       return {
         previewUrl,
         useTemplateUrl,
+        templateId: doc.id,
       };
     })();
 

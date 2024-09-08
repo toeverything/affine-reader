@@ -1,6 +1,6 @@
 "use client";
 
-import { blogReader } from "@/reader";
+import { reader } from "@/reader";
 import { useEffect, useMemo, useReducer, useState } from "react";
 import { PageRenderer } from "../workspace-renderer";
 import EditorContainer from "./components/EditorContainer";
@@ -62,19 +62,19 @@ const parseCollectionData = async (
   docId: string,
   template?: boolean
 ) => {
-  const pages = blogReader.workspaceDocToPagesMeta(rootDoc);
+  const pages = reader.workspaceDocToPagesMeta(rootDoc);
   const pageMeta = pages.find((p) => p.id === docId);
   if (!pageMeta) {
     throw new Error("Page not found");
   }
-  let page = blogReader.parsePageDoc(pageMeta, docId, doc);
+  let page = reader.parsePageDoc(pageMeta, docId, doc);
   if (!page) {
     throw new Error("Page not found");
   }
 
-  page = await blogReader.postprocessPageContent(page);
+  page = await reader.postprocessPageContent(page);
   if (template) {
-    page = await blogReader.postprocessTemplate(page);
+    page = await reader.postprocessTemplate(page);
   }
   return { pages, page };
 };
@@ -99,7 +99,7 @@ function DocPreviewEditorImpl({
 
   useEffect(() => {
     let canceled = false;
-    blogReader.getTemplateList().then((res) => {
+    reader.getTemplateList().then((res) => {
       console.log(res);
     });
 
@@ -137,7 +137,7 @@ export function DocPreviewEditor({
   const docLink = `https://app.affine.pro/workspace/${process.env.NEXT_PUBLIC_BLOG_WORKSPACE_ID}/${docId}`;
 
   useEffect(() => {
-    blogReader.getDocBinary().then((rootDoc) => {
+    reader.getDocBinary().then((rootDoc) => {
       if (!rootDoc) {
         return;
       }
@@ -148,7 +148,7 @@ export function DocPreviewEditor({
       if (!subdoc) {
         return;
       }
-      blogReader.getDocBinary(subdoc.guid).then((doc) => setDocBin(doc));
+      reader.getDocBinary(subdoc.guid).then((doc) => setDocBin(doc));
     });
   }, [docId]);
 

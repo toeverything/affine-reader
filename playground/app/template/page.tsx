@@ -1,11 +1,11 @@
 import { WorkspaceRenderer } from "@/components";
-import { blogReader } from "@/reader";
+import { reader } from "@/reader";
 import { WorkspacePage } from "affine-reader";
 import Link from "next/link";
 
 export default async function TemplatePages() {
-  const pages = await blogReader.getDocPageMetas();
-  const templateList = await blogReader.getTemplateList();
+  const pages = await reader.getDocPageMetas();
+  const templateList = await reader.getTemplateList();
   if (!templateList) {
     return <div>No template list file found</div>;
   }

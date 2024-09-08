@@ -1,6 +1,6 @@
 {
   "name": "affine-reader",
-  "version": "3.0.10",
+  "version": "3.1.0",
   "description": "A simple reader for the blocksuite format",
   "scripts": {
     "test": "vitest",
@@ -20,6 +20,9 @@
     "vitest": "^2.0.5"
   },
   "dependencies": {
+    "@blocksuite/blocks": "^0.17.4",
+    "@blocksuite/presets": "^0.17.4",
+    "@blocksuite/store": "^0.17.4",
     "yjs": "^13.6.18"
   },
   "type": "module",
@@ -48,8 +51,5 @@
   "files": [
     "dist"
   ],
-  "license": "MIT",
-  "peerDependencies": {
-    "@blocksuite/blocks": "0.17.0-canary-202408121434-8bc42f0"
-  }
+  "license": "MIT"
 }

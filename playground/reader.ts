@@ -1,10 +1,10 @@
-import * as reader from "affine-reader/template";
+import * as templateReader from "affine-reader/template";
 
 import assert from "assert";
 
 assert(process.env.NEXT_PUBLIC_BLOG_WORKSPACE_ID, "WORKSPACE_ID is required");
 
-export const blogReader = reader.instantiateReader({
+export const reader = templateReader.instantiateReader({
   workspaceId: process.env.NEXT_PUBLIC_BLOG_WORKSPACE_ID,
   target:
     process.env.NODE_ENV === "development"

@@ -1,9 +1,9 @@
-import { blogReader } from "@/reader";
+import { reader } from "@/reader";
 import { WorkspaceRenderer } from "../components";
 import Link from "next/link";
 
 export default async function Home() {
-  const pages = await blogReader.getDocPageMetas();
+  const pages = await reader.getDocPageMetas();
   return (
     <main>
       <Link href={"/template"}>

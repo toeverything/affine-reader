@@ -6,8 +6,13 @@ import { mdToHTML } from "./md-to-html";
 import styles from "./workspace-renderer.module.css";
 import Link from "next/link";
 import { WorkspacePage, WorkspacePageContent } from "affine-reader/blog";
+import { Template } from "affine-reader/template";
 
-export function PageRenderer({ page }: { page: WorkspacePageContent }) {
+export function PageRenderer({
+  page,
+}: {
+  page: WorkspacePageContent | Template;
+}) {
   const md = page.md?.replaceAll(
     /\[\]\(LinkedPage:([\w-_]*)\)/g,
     (substr, pageId) => {
@@ -20,6 +25,7 @@ export function PageRenderer({ page }: { page: WorkspacePageContent }) {
     }
   );
 
+  const templateId = "templateId" in page ? page.templateId : null;
   return (
     <div>
       <section>
@@ -29,6 +35,12 @@ export function PageRenderer({ page }: { page: WorkspacePageContent }) {
             whiteSpace: "pre-wrap",
           }}
         >
+          <div>
+            <a href={`/api/snapshot?docId=${templateId}`} download>
+              Download snapshot
+            </a>
+          </div>
+
           <code>
             {JSON.stringify(
               omit(page, ["md", "parsedBlocks", "linkedPages", "properties"]),
