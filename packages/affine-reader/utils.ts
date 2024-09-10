@@ -57,19 +57,19 @@ export function parseGrayMatter(
   blocks: Reader.ParsedBlock[],
   index: number
 ): [
-  null | Pick<
-    WorkspacePageContent,
-    | "title"
-    | "authors"
-    | "tags"
-    | "description"
-    | "created"
-    | "updated"
-    | "publish"
-    | "slug"
-  >,
-  number
-] {
+    null | Pick<
+      WorkspacePageContent,
+      | "title"
+      | "authors"
+      | "tags"
+      | "description"
+      | "created"
+      | "updated"
+      | "publish"
+      | "slug"
+    >,
+    number
+  ] {
   if (!isDivider(blocks.at(index))) {
     return [null, index];
   }
@@ -93,11 +93,15 @@ export function parseGrayMatter(
       "LinkedPage:$1"
     );
 
+    gmContent = gmContent.replaceAll(/---\s*\n/gm, "---\n\n");
+
     const { attributes } = fm(gmContent) as any;
 
     return [
       {
         ...attributes,
+        created: attributes.created ? new Date(attributes.created).getTime() : undefined,
+        updated: attributes.updated ? new Date(attributes.updated).getTime() : undefined,
         tags: attributes.tags?.split(",").map((tag: string) => tag.trim()),
         authors: attributes.authors
           ?.split(",")
