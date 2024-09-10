@@ -7,5 +7,6 @@
   },
   "scripts": {
     "test": "vitest"
-  }
+  },
+  "main": "./index.ts"
 }

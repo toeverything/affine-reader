@@ -169,7 +169,7 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
       if (!docBin) {
         return null;
       }
-      return getDocSnapshotFromBin(docId, docBin);
+      return getDocSnapshotFromBin(docId, docBin, blobUrlHandler);
     },
   };
 };

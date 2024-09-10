@@ -13,7 +13,7 @@ async function main() {
     return;
   }
 
-  await reader.getDocMarkdown("s_9N3Eoq9_NWmjCS875by");
+  await reader.getDocSnapshot("s_9N3Eoq9_NWmjCS875by");
 
   // pages.forEach((page) => {
   //   console.log(page.title, page.id);

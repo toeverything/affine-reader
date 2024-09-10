@@ -25,7 +25,6 @@ export function PageRenderer({
     }
   );
 
-  const templateId = "templateId" in page ? page.templateId : null;
   return (
     <div>
       <section>
@@ -36,7 +35,7 @@ export function PageRenderer({
           }}
         >
           <div>
-            <a href={`/api/snapshot?docId=${templateId}`} download>
+            <a href={`/api/snapshot?docId=${page.id}`} download>
               Download snapshot
             </a>
           </div>

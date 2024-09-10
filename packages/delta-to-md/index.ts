@@ -1,1 +1,1 @@
-export * from './delta-to-md';
+export { deltaToMd } from './delta-to-md';

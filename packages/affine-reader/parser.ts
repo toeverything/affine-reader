@@ -5,7 +5,6 @@ import type { Column, Cell } from "@blocksuite/blocks";
 import { html } from "common-tags";
 
 import type { YBlock, YBlocks, Flavour, WorkspacePage } from "./types";
-import { YText } from "yjs/dist/src/internals";
 
 export interface BlockToMdContext {
   target: string;
@@ -277,7 +276,7 @@ export function parseBlock(
         break;
       }
       case "affine:database": {
-        const title = (yBlock.get("prop:title") as YText).toJSON();
+        const title = (yBlock.get("prop:title") as Y.Text).toJSON();
         const childrenTitleById = Object.fromEntries(
           childrenIds.map((cid) => {
             return [
@@ -362,12 +361,12 @@ export function parseBlock(
     result.children =
       flavour !== "affine:database"
         ? childrenIds
-            .map((cid) =>
-              parseBlock(context, yBlocks.get(cid) as YBlock, yBlocks)
-            )
-            .filter(
-              (block) => !(block.content === "" && block.children.length === 0)
-            )
+          .map((cid) =>
+            parseBlock(context, yBlocks.get(cid) as YBlock, yBlocks)
+          )
+          .filter(
+            (block) => !(block.content === "" && block.children.length === 0)
+          )
         : [];
   } catch (e) {
     console.warn("Error converting block to md", e);
@@ -442,7 +441,7 @@ export const parsePageDoc = (
     };
   } else {
     const yPage = yBlocks.get(maybePageBlock[0]) as YBlock;
-    const title = yPage.get("prop:title") as YText;
+    const title = yPage.get("prop:title") as Y.Text;
     const context = {
       target,
       workspaceId,

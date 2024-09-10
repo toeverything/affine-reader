@@ -13,7 +13,8 @@ import { applyUpdate } from "yjs";
  */
 export const getDocSnapshotFromBin = async (
   docId: string,
-  docBin: ArrayBuffer
+  docBin: ArrayBuffer,
+  blobUrlHandler: (id: string) => string
 ) => {
   const globalBlockSuiteSchema = new Schema();
 
@@ -27,13 +28,13 @@ export const getDocSnapshotFromBin = async (
       main: {
         name: "main",
         readonly: true,
-        get: async () => {
-          return new Blob([new Uint8Array([])], { type: "" });
+        get: async (id) => {
+          return await fetch(blobUrlHandler(id)).then(res => res.blob());
         },
         set: async () => {
           return "";
         },
-        delete: async () => {},
+        delete: async () => { },
         list: async () => {
           return [];
         },
