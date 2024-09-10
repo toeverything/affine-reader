@@ -103,7 +103,7 @@ export function parseGrayMatter(
         created: attributes.created ? new Date(attributes.created).getTime() : undefined,
         updated: attributes.updated ? new Date(attributes.updated).getTime() : undefined,
         tags: attributes.tags?.split(",").map((tag: string) => tag.trim()),
-        authors: attributes.authors
+        authors: (attributes.authors || attributes.author)
           ?.split(",")
           .map((author: string) => author.trim()),
       },
