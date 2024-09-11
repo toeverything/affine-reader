@@ -110,21 +110,12 @@ export function instantiateReader({
       ? await getLinkedPagesFromDatabase(relatedTemplatesBlock)
       : [];
 
-    const relatedBlogsBlock = getDatabaseBlock(parsedBlocks, "Related Blogs");
-
-    const relatedBlogs = relatedBlogsBlock
-      ? await getLinkedPagesFromDatabase(relatedBlogsBlock)
-      : [];
-
     // resulting markdown should exclude relatedTemplates and relatedBlogs
     processed.md = parseBlockToMd({
       id: "fake-id",
       content: "",
       flavour: "affine:page",
-      children: parsedBlocks.filter(
-        (block) =>
-          block !== relatedTemplatesBlock && block !== relatedBlogsBlock
-      ),
+      children: parsedBlocks.filter((block) => block !== relatedTemplatesBlock),
     });
 
     const templateId =
@@ -168,7 +159,6 @@ export function instantiateReader({
       ...processed,
       ...templateParams,
       relatedTemplates: relatedTemplates.filter(Boolean) as string[],
-      relatedBlogs: relatedBlogs.filter(Boolean) as string[],
     };
 
     return {
