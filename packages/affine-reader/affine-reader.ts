@@ -62,6 +62,7 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
     try {
       const url = defaultResourcesUrls.doc(target, workspaceId, docId);
       const response = await fetch(url, {
+        cache: "no-cache",
         headers: getFetchHeaders(),
       });
 
@@ -96,6 +97,7 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
     const url = blobUrlHandler(blobId);
     try {
       const res = await fetch(url, {
+        cache: "no-cache",
         headers: getFetchHeaders(),
       });
 
