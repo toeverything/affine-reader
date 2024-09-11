@@ -250,7 +250,6 @@ export function instantiateReader({
     result.coverBlock = coverBlock;
     result.thumbnailBlock = thumbnailBlock;
     result.relatedBlogsBlock = relatedBlogsBlock;
-    result.slug = result.slug?.replace(/\//g, ""); // remove all slashes in slugs
 
     return result;
   }
