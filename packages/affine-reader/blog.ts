@@ -151,16 +151,19 @@ export function instantiateReader({
 
     const parsedDoc = reader.parsePageDoc(doc);
     if (!parsedDoc) {
-      throw new Error("Parsed block is required");
+      console.log("parsedDoc is null");
+      return null;
     }
 
     if (!parsedDoc.parsedBlock) {
-      throw new Error("Parsed block is required");
+      console.log("parsedDoc.parsedBlock is null");
+      return null;
     }
 
     // first level is the page
     if (parsedDoc.parsedBlock.flavour !== "affine:page") {
-      throw new Error("Parsed block is not a page");
+      console.log("parsedDoc.parsedBlock is not a page");
+      return null;
     }
 
     let blocks = parsedDoc.parsedBlock.children.find(
