@@ -32,6 +32,11 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
     throw new Error("Workspace ID and target are required");
   }
 
+  const defaultBlobUrlHandler = (id: string) =>
+    defaultResourcesUrls.blob(target, workspaceId, id);
+
+  const blobUrlHandler = config.blobUrlHandler ?? defaultBlobUrlHandler;
+
   const getFetchHeaders = () => {
     const headers: HeadersInit = {};
     if (config.jwtToken) {
@@ -57,7 +62,6 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
     try {
       const url = defaultResourcesUrls.doc(target, workspaceId, docId);
       const response = await fetch(url, {
-        cache: "no-cache",
         headers: getFetchHeaders(),
       });
 
@@ -89,10 +93,9 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
    * @returns
    */
   const getBlob = async (blobId: string) => {
-    const url = defaultResourcesUrls.blob(target, workspaceId, blobId);
+    const url = blobUrlHandler(blobId);
     try {
       const res = await fetch(url, {
-        cache: "no-cache",
         headers: getFetchHeaders(),
       });
 
@@ -138,11 +141,6 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
     return pageMetas;
   };
 
-  const defaultBlobUrlHandler = (id: string) =>
-    defaultResourcesUrls.blob(target, workspaceId, id);
-
-  const blobUrlHandler = config.blobUrlHandler ?? defaultBlobUrlHandler;
-
   const getDocMarkdown = async (docId = workspaceId) => {
     const doc = await getDoc(docId);
     if (!doc) {
@@ -153,6 +151,8 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
   };
 
   return {
+    target,
+    workspaceId,
     blobUrlHandler,
     getBlob,
     getDoc,
@@ -169,7 +169,7 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
       if (!docBin) {
         return null;
       }
-      return getDocSnapshotFromBin(docId, docBin, blobUrlHandler);
+      return getDocSnapshotFromBin(docId, docBin, getBlob);
     },
   };
 };

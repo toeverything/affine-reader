@@ -7,12 +7,11 @@ import {
   parseBlockToMd,
   ParsedBlock,
 } from "./parser";
-import { findNextBlock, skipEmptyBlocks } from "./utils";
+import { findNextBlock, getDatabaseBlock, skipEmptyBlocks } from "./utils";
 
 export interface Template extends Blog.WorkspacePageContent {
   // New fields
   relatedTemplates: string[]; // 关联模板，元素值为 slug
-  relatedBlogs: string[]; // 关联博客，元素值为 slug
   useTemplateUrl?: string; // 点击 Use this template 后跳转的链接
   previewUrl?: string; // 点击 Preview 跳换的链接
   templateId?: string; // 模板的 id
@@ -53,19 +52,6 @@ export function instantiateReader({
 
   const META_LIST_NAME = "meta:template-list";
 
-  function getDatabaseBlock(blocks: ParsedBlock[], title: string) {
-    const normalizedTitle = (v: string) => v.replaceAll(" ", "").toLowerCase();
-
-    return findNextBlock(
-      blocks,
-      0,
-      (block): block is DatabaseBlock =>
-        block.flavour === "affine:database" &&
-        normalizedTitle((block as DatabaseBlock).title) ===
-          normalizedTitle(title)
-    )?.[0];
-  }
-
   async function getCategoryDescription(blocks: ParsedBlock[], index: number) {
     // find 'embed-synced-doc' after index
     const block = skipEmptyBlocks(blocks, index + 1)[0] as EmbedSyncedDocBlock;
@@ -105,19 +91,10 @@ export function instantiateReader({
     return pages.map((p) => p.slug);
   }
 
-  async function pageIdToSlug(pageId: string) {
-    const page = await _reader?.getWorkspacePageContent(pageId);
-    if (!page) {
-      return null;
-    }
-
-    return page.slug;
-  }
-
   async function postprocessTemplate(
     rawTemplate: Blog.WorkspacePageContent
   ): Promise<Template | null> {
-    const processed = await _reader.postprocessPageContent(rawTemplate);
+    const processed = await _reader.postprocessBlogContent(rawTemplate);
     const docs = await _reader.getDocPageMetas();
     const parsedBlocks = processed.parsedBlocks;
     if (!parsedBlocks) {
@@ -173,8 +150,12 @@ export function instantiateReader({
       params.set("pageId", doc.id);
       params.set("name", processed.title || doc.title);
 
-      const previewUrl = `https://app.affine.pro/template/preview?${params.toString()}`;
-      const useTemplateUrl = `https://app.affine.pro/template/import?${params.toString()}`;
+      const previewUrl = `${
+        _reader.target
+      }/template/preview?${params.toString()}`;
+      const useTemplateUrl = `${
+        _reader.target
+      }/template/import?${params.toString()}`;
 
       return {
         previewUrl,
@@ -225,7 +206,7 @@ export function instantiateReader({
       return null;
     }
 
-    const parsed = await reader?.getWorkspacePageContent(page.id);
+    const parsed = await reader?.getWorkspacePageContent(page.id, true);
     if (!parsed) {
       return null;
     }

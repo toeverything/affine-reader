@@ -113,3 +113,16 @@ export function parseGrayMatter(
     return [null, index];
   }
 }
+
+export function getDatabaseBlock(blocks: Reader.ParsedBlock[], title: string) {
+  const normalizedTitle = (v: string) => v.replaceAll(" ", "").toLowerCase();
+
+  return findNextBlock(
+    blocks,
+    0,
+    (block): block is Reader.DatabaseBlock =>
+      block.flavour === "affine:database" &&
+      normalizedTitle((block as Reader.DatabaseBlock).title) ===
+      normalizedTitle(title)
+  )?.[0];
+}

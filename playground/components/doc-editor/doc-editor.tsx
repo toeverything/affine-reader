@@ -67,16 +67,14 @@ const parseCollectionData = async (
   if (!pageMeta) {
     throw new Error("Page not found");
   }
-  let page = reader.parsePageDoc(pageMeta, docId, doc);
+  const page = reader.preprocessBlogContent(pageMeta, docId, doc);
   if (!page) {
     throw new Error("Page not found");
   }
 
-  page = await reader.postprocessPageContent(page);
-  if (template) {
-    page = await reader.postprocessTemplate(page);
-  }
-  return { pages, page };
+  return template
+    ? { pages, page: await reader.postprocessTemplate(page) }
+    : { pages, page: await reader.postprocessBlogContent(page) };
 };
 
 function DocPreviewEditorImpl({

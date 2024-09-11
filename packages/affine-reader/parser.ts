@@ -21,6 +21,12 @@ export interface BaseParsedBlock {
   type?: string;
 }
 
+export interface ParsedDoc {
+  title: string;
+  md: string;
+  parsedBlock?: ParsedBlock;
+}
+
 export interface ParagraphBlock extends BaseParsedBlock {
   flavour: "affine:paragraph";
   type: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "quote";
@@ -426,7 +432,7 @@ export const parsePageDoc = (
   target: string,
   pageDoc: Y.Doc,
   blobUrlHandler: (blobId: string) => string
-) => {
+): ParsedDoc => {
   // we assume that the first block is the page block
   const yBlocks: YBlocks = pageDoc.getMap("blocks");
   const maybePageBlock = Object.entries(yBlocks.toJSON()).find(

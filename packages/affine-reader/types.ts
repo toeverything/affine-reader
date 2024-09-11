@@ -63,5 +63,6 @@ export interface WorkspacePageContent {
   publish?: boolean;
   parsedBlocks?: ParsedBlock[];
   linkedPages?: WorkspacePageContent[];
+  relatedBlogs?: string[];
   valid?: boolean;
 }

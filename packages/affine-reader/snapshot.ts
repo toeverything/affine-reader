@@ -14,7 +14,7 @@ import { applyUpdate } from "yjs";
 export const getDocSnapshotFromBin = async (
   docId: string,
   docBin: ArrayBuffer,
-  blobUrlHandler: (id: string) => string
+  getBlob: (id: string) => Promise<Blob | null>
 ) => {
   const globalBlockSuiteSchema = new Schema();
 
@@ -28,9 +28,7 @@ export const getDocSnapshotFromBin = async (
       main: {
         name: "main",
         readonly: true,
-        get: async (id) => {
-          return await fetch(blobUrlHandler(id)).then(res => res.blob());
-        },
+        get: getBlob,
         set: async () => {
           return "";
         },
