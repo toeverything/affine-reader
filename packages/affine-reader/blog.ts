@@ -177,7 +177,6 @@ export function instantiateReader({
 
     const result: PreprocessedPageContent = {
       id: pageId,
-      parsedBlocks: blocks,
     };
 
     // gray matter is the part
@@ -247,6 +246,7 @@ export function instantiateReader({
 
     Object.assign(result, docMeta);
 
+    result.parsedBlocks = validChildren;
     result.valid = isValidPage(result);
     result.relatedBlogIds = relatedBlogIds;
     result.linkedPageIds = linkedPageIds;
