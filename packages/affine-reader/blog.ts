@@ -110,9 +110,14 @@ export function instantiateReader({
     );
   }
 
-  function getLinkedPageIdsFromMarkdown(md: string): string[] {
-    const linkedPageIds = md.matchAll(/\[\]\(LinkedPage:([\w-_]*)\)/g);
-    return Array.from(linkedPageIds).map(([_, id]) => id);
+  function getLinkedPageIdsFromMarkdown(
+    md: string
+  ): { id: string; mode: string }[] {
+    const linkedPageIds = md.matchAll(/\[\]\(LinkedPage:([\w-_:]*)\)/g);
+    return Array.from(linkedPageIds).map(([_, pageId]) => {
+      const [id, mode] = pageId.split(":");
+      return { id, mode: mode || "page" };
+    });
   }
 
   async function getRichLinkedPages(pageIds: string[]) {
@@ -248,8 +253,8 @@ export function instantiateReader({
 
     result.parsedBlocks = validChildren;
     result.valid = isValidPage(result);
-    result.relatedBlogIds = relatedBlogIds;
-    result.linkedPageIds = linkedPageIds;
+    result.relatedBlogIds = relatedBlogIds.map((b) => b.id);
+    result.linkedPageIds = linkedPageIds.map((b) => b.id);
     result.coverBlock = coverBlock;
     result.thumbnailBlock = thumbnailBlock;
     result.relatedBlogsBlock = relatedBlogsBlock;

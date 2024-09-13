@@ -26,7 +26,14 @@ export default {
       return ["[", "](" + url + ")"];
     },
     reference: function (reference) {
-      return ["[", "](" + reference.type + ":" + reference.pageId + ")"];
+      if (reference.params?.mode) {
+        return [
+          "[",
+          `](${reference.type}:${reference.pageId}:${reference.params.mode})`,
+        ];
+      }
+
+      return ["[", `](${reference.type}:${reference.pageId})`];
     },
     strike: function () {
       return ["~~", "~~"];

@@ -12,9 +12,8 @@ import { findNextBlock, getDatabaseBlock, skipEmptyBlocks } from "./utils";
 export interface Template extends Blog.WorkspacePageContent {
   // New fields
   relatedTemplates: string[]; // 关联模板，元素值为 slug
-  useTemplateUrl?: string; // 点击 Use this template 后跳转的链接
-  previewUrl?: string; // 点击 Preview 跳换的链接
   templateId?: string; // 模板的 id
+  templateMode?: "page" | "edgeless"; // 模板的模式
 }
 
 export interface TemplateCategory {
@@ -87,7 +86,9 @@ export function instantiateReader({
     }
 
     const linkedPageIds = _reader.getLinkedPageIdsFromMarkdown(block.content);
-    const pages = await _reader.getRichLinkedPages(linkedPageIds);
+    const pages = await _reader.getRichLinkedPages(
+      linkedPageIds.map((p) => p.id)
+    );
     return pages.map((p) => p.slug);
   }
 
@@ -118,17 +119,19 @@ export function instantiateReader({
       children: parsedBlocks.filter((block) => block !== relatedTemplatesBlock),
     });
 
-    const templateId =
+    const templateIdWithMode =
       "template" in processed
         ? (processed.template as string).startsWith("LinkedPage:")
           ? (processed.template as string).slice("LinkedPage:".length)
-          : processed.template
+          : null
         : null;
 
     const templateParams = (() => {
-      if (!templateId) {
+      if (!templateIdWithMode) {
         return undefined;
       }
+
+      const [templateId, mode] = templateIdWithMode.split(":");
 
       // templateId -> pageId
       const doc = docs?.find((doc) => doc.guid === templateId);
@@ -136,22 +139,9 @@ export function instantiateReader({
         return undefined;
       }
 
-      const params = new URLSearchParams();
-      params.set("workspaceId", workspaceId);
-      params.set("pageId", doc.id);
-      params.set("name", processed.title || doc.title);
-
-      const previewUrl = `${
-        _reader.target
-      }/template/preview?${params.toString()}`;
-      const useTemplateUrl = `${
-        _reader.target
-      }/template/import?${params.toString()}`;
-
       return {
-        previewUrl,
-        useTemplateUrl,
         templateId: doc.id,
+        templateMode: (mode || "page") as "page" | "edgeless",
       };
     })();
 
@@ -177,8 +167,7 @@ export function instantiateReader({
         template.parsedBlocks &&
         template.relatedTemplates &&
         template.relatedBlogs &&
-        template.useTemplateUrl &&
-        template.previewUrl
+        template.templateId
     );
   }
 
@@ -223,7 +212,9 @@ export function instantiateReader({
     const parseDatabase = async (block: DatabaseBlock) => {
       const templates: Template[] = [];
 
-      for (const id of _reader.getLinkedPageIdsFromMarkdown(block.content)) {
+      for (const { id } of _reader.getLinkedPageIdsFromMarkdown(
+        block.content
+      )) {
         if (cache.has(id)) {
           templates.push(cache.get(id)!);
           continue;
