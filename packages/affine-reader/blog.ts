@@ -194,10 +194,6 @@ export function instantiateReader({
 
     const gmResult = parseGrayMatter(blocks, currentIndex);
 
-    if (gmResult[0]) {
-      Object.assign(result, gmResult[0]);
-    }
-
     currentIndex = gmResult[1];
 
     // first image block is the cover
@@ -250,6 +246,10 @@ export function instantiateReader({
     delete docMeta["tags"];
 
     Object.assign(result, docMeta);
+
+    if (gmResult[0]) {
+      Object.assign(result, gmResult[0]);
+    }
 
     result.parsedBlocks = validChildren;
     result.valid = isValidPage(result);
