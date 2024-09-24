@@ -171,9 +171,9 @@ export function instantiateReader({
       return null;
     }
 
-    let blocks = parsedDoc.parsedBlock.children.find(
-      (block) => block.flavour === "affine:note"
-    )?.children;
+    let blocks = parsedDoc.parsedBlock.children
+      .filter((block) => block.flavour === "affine:note")
+      .flatMap((block) => block.children);
 
     if (!blocks) {
       console.log("page may be a canvas, skip");

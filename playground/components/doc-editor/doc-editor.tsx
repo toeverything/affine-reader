@@ -97,9 +97,6 @@ function DocPreviewEditorImpl({
 
   useEffect(() => {
     let canceled = false;
-    reader.getTemplateList().then((res) => {
-      console.log(res);
-    });
 
     parseCollectionData(collection.doc, doc.spaceDoc, docId, template).then(
       ({ page }) => {
