@@ -308,7 +308,7 @@ export function parseBlock(
 
         const dbRows: string[][] = childrenIds
           .map((cid, index) => {
-            const row = cells[index];
+            const row = cells[cid];
             return cols.map((col) => {
               const value = row?.[col.id]?.value;
 
@@ -368,12 +368,12 @@ export function parseBlock(
     result.children =
       flavour !== "affine:database"
         ? childrenIds
-          .map((cid) =>
-            parseBlock(context, yBlocks.get(cid) as YBlock, yBlocks)
-          )
-          .filter(
-            (block) => !(block.content === "" && block.children.length === 0)
-          )
+            .map((cid) =>
+              parseBlock(context, yBlocks.get(cid) as YBlock, yBlocks)
+            )
+            .filter(
+              (block) => !(block.content === "" && block.children.length === 0)
+            )
         : [];
   } catch (e) {
     console.warn("Error converting block to md", e);
