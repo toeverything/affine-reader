@@ -1,5 +1,4 @@
-"use client";;
-import { use } from "react";
+"use client";
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
@@ -7,21 +6,18 @@ import Link from "next/link";
 const DocPreviewEditor = dynamic(
   () =>
     import("@/components/doc-editor/doc-editor").then(
-      (mod) => ({
-        default: mod.DocPreviewEditor
-      })
+      (mod) => mod.DocPreviewEditor
     ),
   {
     ssr: false,
   }
 );
 
-export default function DocPreviewEditorPage(
-  props: {
-    params: Promise<{ docId: string }>;
-  }
-) {
-  const params = use(props.params);
+export default function DocPreviewEditorPage({
+  params,
+}: {
+  params: { docId: string };
+}) {
   return (
     <main>
       <Link href={"/"}>
