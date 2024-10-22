@@ -1,8 +1,7 @@
 import { DocCollection } from "@blocksuite/store";
 
 import { ZipTransformer } from "@blocksuite/blocks";
-import { AffineSchemas } from "@blocksuite/blocks/schemas";
-import { AIChatBlockSchema } from "@blocksuite/presets";
+import { AffineSchemas } from "@blocksuite/affine/blocks/schemas";
 import { Schema } from "@blocksuite/store";
 import { applyUpdate } from "yjs";
 
@@ -18,8 +17,7 @@ export const getDocSnapshotFromBin = async (
 ) => {
   const globalBlockSuiteSchema = new Schema();
 
-  const schemas = [...AffineSchemas, AIChatBlockSchema];
-  globalBlockSuiteSchema.register(schemas);
+  globalBlockSuiteSchema.register(AffineSchemas);
 
   const docCollection = new DocCollection({
     id: "test",
@@ -32,7 +30,7 @@ export const getDocSnapshotFromBin = async (
         set: async () => {
           return "";
         },
-        delete: async () => { },
+        delete: async () => {},
         list: async () => {
           return [];
         },
