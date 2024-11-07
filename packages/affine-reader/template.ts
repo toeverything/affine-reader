@@ -141,7 +141,9 @@ export function instantiateReader({
 
       return {
         templateId: doc.id,
-        templateMode: (mode || "page") as "page" | "edgeless",
+        templateMode: (mode || doc.properties?.primaryMode || "page") as
+          | "page"
+          | "edgeless",
       };
     })();
 

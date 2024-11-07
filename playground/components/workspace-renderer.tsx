@@ -42,7 +42,7 @@ export function PageRenderer({
 
           <code>
             {JSON.stringify(
-              omit(page, ["md", "parsedBlocks", "linkedPages", "properties"]),
+              omit(page, ["md", "parsedBlocks", "linkedPages"]),
               null,
               2
             )}

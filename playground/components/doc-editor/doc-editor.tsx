@@ -62,7 +62,8 @@ const parseCollectionData = async (
   docId: string,
   template?: boolean
 ) => {
-  const pages = reader.workspaceDocToPagesMeta(rootDoc);
+  const propertiesDoc = await reader.getDocProperties();
+  const pages = reader.workspaceDocToPagesMeta(rootDoc, propertiesDoc);
   const pageMeta = pages.find((p) => p.id === docId);
   if (!pageMeta) {
     throw new Error("Page not found");

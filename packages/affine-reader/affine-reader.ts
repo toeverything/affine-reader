@@ -134,12 +134,17 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
     }
   };
 
+  const getDocProperties = async (docId = workspaceId) => {
+    return getDoc(`db$${docId}$docProperties`);
+  };
+
   const getDocPageMetas = async (docId = workspaceId) => {
     const doc = await getDoc(docId);
+    const docProperties = await getDocProperties(docId);
     if (!doc) {
       return null;
     }
-    const pageMetas = workspaceDocToPagesMeta(doc);
+    const pageMetas = workspaceDocToPagesMeta(doc, docProperties);
     return pageMetas;
   };
 
@@ -160,6 +165,7 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
     getDoc,
     getDocBinary,
     getDocPageMetas,
+    getDocProperties,
     getDocPageContent: getDocMarkdown,
     getDocMarkdown,
     parsePageDoc: (doc: Y.Doc) => {
