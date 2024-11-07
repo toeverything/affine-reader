@@ -1,6 +1,6 @@
 {
   "name": "affine-reader",
-  "version": "3.2.12",
+  "version": "3.3.0",
   "description": "A simple reader for the blocksuite format",
   "scripts": {
     "test": "vitest",
@@ -20,10 +20,11 @@
     "vitest": "^2.0.5"
   },
   "dependencies": {
+    "@blocksuite/affine": "^0.17.27",
     "@blocksuite/blocks": "^0.17.27",
     "@blocksuite/presets": "^0.17.27",
     "@blocksuite/store": "^0.17.27",
-    "@blocksuite/affine": "^0.17.27",
+    "fflate": "^0.8.2",
     "yjs": "^13.6.18"
   },
   "type": "module",
