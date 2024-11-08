@@ -411,7 +411,7 @@ export const parsePageDoc = (
 ): ParsedDoc => {
   // we assume that the first block is the page block
   const yBlocks: YBlocks = pageDoc.getMap("blocks");
-  const maybePageBlock = Object.entries(yBlocks.toJSON()).find(
+  const maybePageBlock = Object.entries(yBlocks.toJSON()).findLast(
     ([_, b]) => b["sys:flavour"] === "affine:page"
   );
 
