@@ -110,6 +110,8 @@ export function parseGrayMatter(
         authors: (attributes.authors || attributes.author)
           ?.split(",")
           .map((author: string) => author.trim()),
+        // sanitize slug so that it only contains alphanumeric characters and -
+        slug: attributes.slug?.replaceAll(/[^a-zA-Z0-9-]/g, ""),
       },
       nextDividerIndex + 1,
     ];
