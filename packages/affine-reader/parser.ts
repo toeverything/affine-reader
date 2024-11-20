@@ -431,6 +431,9 @@ export const parsePageDoc = (
       blobUrlHandler,
     };
     const rootBlock = parseBlock(context, yPage, yBlocks);
+    rootBlock.children = rootBlock.children.filter(
+      (block): block is BaseParsedBlock => block.flavour === "affine:note"
+    );
     const md = parseBlockToMd(rootBlock);
 
     return {
