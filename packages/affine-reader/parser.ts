@@ -361,19 +361,19 @@ export function parseBlock(
         break;
       }
       default: {
-        console.warn("Unknown or unsupported flavour", flavour);
+        // console.warn("Unknown or unsupported flavour", flavour);
       }
     }
 
     result.children =
       flavour !== "affine:database"
         ? childrenIds
-            .map((cid) =>
-              parseBlock(context, yBlocks.get(cid) as YBlock, yBlocks)
-            )
-            .filter(
-              (block) => !(block.content === "" && block.children.length === 0)
-            )
+          .map((cid) =>
+            parseBlock(context, yBlocks.get(cid) as YBlock, yBlocks)
+          )
+          .filter(
+            (block) => !(block.content === "" && block.children.length === 0)
+          )
         : [];
   } catch (e) {
     console.warn("Error converting block to md", e);
