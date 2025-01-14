@@ -298,9 +298,7 @@ export function instantiateReader({
           if (!linkedPage) {
             return substr;
           }
-          return `[${title || linkedPage.title}(/${linkedPage.slug})](/${
-            linkedPage.id
-          })`;
+          return `[${title || linkedPage.title}](/${linkedPage.slug})`;
         }
       ),
     };
