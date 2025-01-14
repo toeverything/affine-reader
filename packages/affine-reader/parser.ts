@@ -125,9 +125,13 @@ export const parseBlockToMd = (
 
 export function parseBlock(
   context: BlockToMdContext,
-  yBlock: YBlock,
+  yBlock: YBlock | undefined,
   yBlocks: YBlocks // all blocks
-): ParsedBlock {
+): ParsedBlock | null {
+  if (!yBlock) {
+    return null;
+  }
+
   const id = yBlock.get("sys:id") as string;
   const flavour = yBlock.get("sys:flavour") as Flavour;
   const type = yBlock.get("prop:type") as string;
@@ -286,12 +290,15 @@ export function parseBlock(
         const title = (yBlock.get("prop:title") as Y.Text).toJSON();
         const childrenTitleById = Object.fromEntries(
           childrenIds.map((cid) => {
-            return [
-              cid,
-              parseBlockToMd(
-                parseBlock(context, yBlocks.get(cid) as YBlock, yBlocks)
-              ),
-            ] as const;
+            const child = parseBlock(
+              context,
+              yBlocks.get(cid) as YBlock | undefined,
+              yBlocks
+            );
+            if (!child) {
+              return [cid, ""];
+            }
+            return [cid, parseBlockToMd(child)] as const;
           })
         );
         const cols = (
@@ -368,12 +375,18 @@ export function parseBlock(
     result.children =
       flavour !== "affine:database"
         ? childrenIds
-          .map((cid) =>
-            parseBlock(context, yBlocks.get(cid) as YBlock, yBlocks)
-          )
-          .filter(
-            (block) => !(block.content === "" && block.children.length === 0)
-          )
+            .map((cid) =>
+              parseBlock(
+                context,
+                yBlocks.get(cid) as YBlock | undefined,
+                yBlocks
+              )
+            )
+            .filter(
+              (block): block is ParsedBlock =>
+                !!block &&
+                !(block.content === "" && block.children.length === 0)
+            )
         : [];
   } catch (e) {
     console.warn("Error converting block to md", e);
@@ -431,6 +444,12 @@ export const parsePageDoc = (
       blobUrlHandler,
     };
     const rootBlock = parseBlock(context, yPage, yBlocks);
+    if (!rootBlock) {
+      return {
+        title: "",
+        md: "",
+      };
+    }
     rootBlock.children = rootBlock.children.filter(
       (block): block is BaseParsedBlock => block.flavour === "affine:note"
     );

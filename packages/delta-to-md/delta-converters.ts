@@ -26,14 +26,20 @@ export default {
       return ["[", "](" + url + ")"];
     },
     reference: function (reference) {
+      // [](LinkedPage:xxx)
       if (reference.params?.mode) {
         return [
           "[",
-          `](${reference.type}:${reference.pageId}:${reference.params.mode})`,
+          `${reference.title || ""}](${reference.type}:${reference.pageId}:${
+            reference.params.mode
+          })`,
         ];
       }
 
-      return ["[", `](${reference.type}:${reference.pageId})`];
+      return [
+        "[",
+        `${reference.title || ""}](${reference.type}:${reference.pageId})`,
+      ];
     },
     strike: function () {
       return ["~~", "~~"];

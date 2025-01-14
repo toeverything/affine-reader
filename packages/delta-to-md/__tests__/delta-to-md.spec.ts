@@ -362,6 +362,7 @@ test("page links", () => {
         insert: " ",
         attributes: {
           reference: {
+            title: "some title",
             type: "LinkedPage",
             pageId: "vQ5BY1E2MiPfE6gPaaOht",
           },
@@ -373,7 +374,7 @@ test("page links", () => {
     ])
   ).toEqual(
     // pass down to downstream to decide how to render the link
-    "aaa [](LinkedPage:vQ5BY1E2MiPfE6gPaaOht) bbbb\n"
+    "aaa [some title](LinkedPage:vQ5BY1E2MiPfE6gPaaOht) bbbb\n"
   );
 });
 

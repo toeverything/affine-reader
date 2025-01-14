@@ -113,10 +113,10 @@ export function instantiateReader({
   function getLinkedPageIdsFromMarkdown(
     md: string
   ): { id: string; mode: string }[] {
-    const linkedPageIds = md.matchAll(/\[\]\(LinkedPage:([\w-_:]*)\)/g);
-    return Array.from(linkedPageIds).map(([_, pageId]) => {
-      const [id, mode] = pageId.split(":");
-      return { id, mode: mode || "page" };
+    const linkedPageIds = md.matchAll(/\[(.*)\]\((LinkedPage:[\w-_:]*)\)/g);
+    return Array.from(linkedPageIds).map(([_, title, pageId]) => {
+      const [id, mode] = pageId.replace("LinkedPage:", "").split(":");
+      return { id, title, mode: mode || "page" };
     });
   }
 

@@ -14,14 +14,16 @@ export function PageRenderer({
   page: WorkspacePageContent | Template;
 }) {
   const md = page.md?.replaceAll(
-    /\[\]\(LinkedPage:([\w-_]*)\)/g,
-    (substr, pageId) => {
+    /\[(.*)\]\(LinkedPage:([\w-_]*)\)/g,
+    (substr, title, pageId) => {
       // find the page title
       const linkedPage = page.linkedPages?.find((p) => p.id === pageId);
       if (!linkedPage) {
         return substr;
       }
-      return `[${linkedPage.title}(/${linkedPage.slug})](/${linkedPage.id})`;
+      return `[${title || linkedPage.title}(/${linkedPage.slug})](/${
+        linkedPage.id
+      })`;
     }
   );
 
