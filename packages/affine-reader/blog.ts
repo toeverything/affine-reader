@@ -112,7 +112,7 @@ export function instantiateReader({
 
   function getLinkedPageIdsFromMarkdown(
     md: string
-  ): { id: string; mode: string }[] {
+  ): { id: string; title: string; mode: string }[] {
     const linkedPageIds = md.matchAll(/\[(.*)\]\((LinkedPage:[\w-_:]*)\)/g);
     return Array.from(linkedPageIds).map(([_, title, pageId]) => {
       const [id, mode] = pageId.replace("LinkedPage:", "").split(":");
@@ -291,6 +291,18 @@ export function instantiateReader({
       ...preprocessed,
       linkedPages,
       relatedBlogs: relatedBlogs.map((b) => b.slug).filter(Boolean) as string[],
+      md: preprocessed.md?.replaceAll(
+        /\[(.*)\]\(LinkedPage:([\w-_]*)\)/g,
+        (substr, title, pageId) => {
+          const linkedPage = linkedPages?.find((p) => p.id === pageId);
+          if (!linkedPage) {
+            return substr;
+          }
+          return `[${title || linkedPage.title}(/${linkedPage.slug})](/${
+            linkedPage.id
+          })`;
+        }
+      ),
     };
 
     return res;

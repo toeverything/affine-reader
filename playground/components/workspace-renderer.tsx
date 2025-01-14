@@ -13,20 +13,6 @@ export function PageRenderer({
 }: {
   page: WorkspacePageContent | Template;
 }) {
-  const md = page.md?.replaceAll(
-    /\[(.*)\]\(LinkedPage:([\w-_]*)\)/g,
-    (substr, title, pageId) => {
-      // find the page title
-      const linkedPage = page.linkedPages?.find((p) => p.id === pageId);
-      if (!linkedPage) {
-        return substr;
-      }
-      return `[${title || linkedPage.title}(/${linkedPage.slug})](/${
-        linkedPage.id
-      })`;
-    }
-  );
-
   return (
     <div>
       <section>
@@ -57,10 +43,10 @@ export function PageRenderer({
       </section>
       <section className={styles.twoColumnWrapper}>
         <article className={styles.page}>
-          <pre className={styles.markdown}>{md}</pre>
+          <pre className={styles.markdown}>{page.md}</pre>
         </article>
         <article className={styles.page}>
-          <div dangerouslySetInnerHTML={{ __html: mdToHTML(md ?? "") }} />
+          <div dangerouslySetInnerHTML={{ __html: mdToHTML(page.md ?? "") }} />
         </article>
       </section>
     </div>
