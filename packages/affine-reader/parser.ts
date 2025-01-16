@@ -355,7 +355,14 @@ export function parseBlock(
         result.content =
           [header, divider, ...dbRows]
             .map((row) => {
-              return "|" + row.join("|").replace(/\n/g, "<br />") + "|";
+              return (
+                "|" +
+                row
+                  .map((cell) => cell.trim())
+                  .join("|")
+                  .replace(/\n+/g, "<br />") +
+                "|"
+              );
             })
             .join("\n") + "\n\n";
 
