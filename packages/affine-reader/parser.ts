@@ -358,7 +358,7 @@ export function parseBlock(
               return (
                 "|" +
                 row
-                  .map((cell) => cell.trim())
+                  .map((cell) => String(cell || "")?.trim())
                   .join("|")
                   .replace(/\n+/g, "<br />") +
                 "|"
