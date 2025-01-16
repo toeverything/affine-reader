@@ -51,11 +51,13 @@ export function instantiateReader({
   sessionToken,
   jwtToken,
   target,
+  blogBasePath,
 }: {
   workspaceId: string;
   sessionToken?: string;
   jwtToken?: string;
   target?: string;
+  blogBasePath?: string; // e.g., /blog
 }) {
   reader = Reader.getBlocksuiteReader({
     workspaceId,
@@ -298,7 +300,9 @@ export function instantiateReader({
           if (!linkedPage) {
             return substr;
           }
-          return `[${title || linkedPage.title}](/${linkedPage.slug})`;
+          return `[${title || linkedPage.title}](${blogBasePath}/${
+            linkedPage.slug
+          })`;
         }
       ),
     };

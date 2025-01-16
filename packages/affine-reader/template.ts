@@ -7,7 +7,7 @@ import {
   parseBlockToMd,
   ParsedBlock,
 } from "./parser";
-import { findNextBlock, getDatabaseBlock, skipEmptyBlocks } from "./utils";
+import { getDatabaseBlock, skipEmptyBlocks } from "./utils";
 
 export interface Template extends Blog.WorkspacePageContent {
   // New fields
@@ -34,17 +34,20 @@ export function instantiateReader({
   sessionToken,
   jwtToken,
   target,
+  blogBasePath,
 }: {
   workspaceId: string;
   sessionToken?: string;
   jwtToken?: string;
   target?: string;
+  blogBasePath?: string;
 }) {
   reader = Blog.instantiateReader({
     workspaceId,
     sessionToken,
     jwtToken,
     target,
+    blogBasePath,
   });
 
   const _reader = reader;
