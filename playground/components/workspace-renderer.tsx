@@ -6,15 +6,17 @@ import { mdToHTML } from "./md-to-html";
 import styles from "./workspace-renderer.module.css";
 import Link from "next/link";
 import { WorkspacePage, WorkspacePageContent } from "affine-reader/blog";
-import { Template } from "affine-reader/template";
+import { Template } from "affine-reader/template-v2";
 
 export function PageRenderer({
   page,
+  style,
 }: {
   page: WorkspacePageContent | Template;
+  style?: React.CSSProperties;
 }) {
   return (
-    <div>
+    <div style={style}>
       <section>
         <legend>metadata</legend>
         <pre
@@ -80,7 +82,7 @@ export function WorkspaceRenderer({
                   <Link
                     className={styles.pageLink}
                     key={page.id}
-                    href={`${template ? "/template" : ""}/${page.id}`}
+                    href={`${template ? "/templates" : ""}/${page.id}`}
                     passHref
                   >
                     {page.title || page.id}

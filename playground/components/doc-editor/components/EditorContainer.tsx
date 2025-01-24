@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useEditor } from "../editor/context";
 
-const EditorContainer = () => {
+const EditorContainer = ({ style }: { style?: React.CSSProperties }) => {
   const { editor } = useEditor()!;
 
   const editorContainerRef = useRef<HTMLDivElement>(null);
@@ -15,7 +15,7 @@ const EditorContainer = () => {
 
   return (
     <div
-      style={{ width: "100%", height: "100%" }}
+      style={{ width: "100%", height: "100%", ...style }}
       ref={editorContainerRef}
     ></div>
   );

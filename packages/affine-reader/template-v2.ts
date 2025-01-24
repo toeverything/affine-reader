@@ -20,7 +20,7 @@ export interface TemplateCategory {
   category: string;
   title: string;
   slug: string;
-  list: Template[];
+  templates: string[];
   featured: Template;
   description: string; // 模板列表页面的描述, Markdown格式
 }
@@ -52,7 +52,8 @@ export function instantiateReader({
 
   const _reader = reader;
 
-  const META_LIST_NAME = "meta:template-list";
+  const META_CATEGORY_LIST_NAME = "meta:category-list";
+  const META_CATEGORY_DATABASE_NAME = "category-list";
 
   async function getCategoryDescription(blocks: ParsedBlock[], index: number) {
     // find 'embed-synced-doc' after index
@@ -92,7 +93,7 @@ export function instantiateReader({
     const pages = await _reader.getRichLinkedPages(
       linkedPageIds.map((p) => p.id)
     );
-    return pages.map((p) => p.slug);
+    return pages;
   }
 
   async function postprocessTemplate(
@@ -111,7 +112,9 @@ export function instantiateReader({
     );
 
     const relatedTemplates = relatedTemplatesBlock
-      ? await getLinkedPagesFromDatabase(relatedTemplatesBlock)
+      ? (await getLinkedPagesFromDatabase(relatedTemplatesBlock)).map(
+          (p) => p.id
+        )
       : [];
 
     // resulting markdown should exclude relatedTemplates and relatedBlogs
@@ -176,21 +179,26 @@ export function instantiateReader({
     );
   }
 
-  async function getTemplateList(): Promise<{
-    categories: TemplateCategory[];
+  async function getCategoryList(): Promise<{
+    categoryPages: Blog.WorkspacePage[];
     templateListPageId: string;
   } | null> {
-    const doc = await reader?.getDocPageMetas();
-    if (!doc) {
+    const pageMetas = await reader?.getDocPageMetas();
+    if (!pageMetas) {
       return null;
     }
 
-    const page = doc.find((page) => page.title === META_LIST_NAME);
-    if (!page) {
+    const categoryListPage = pageMetas.find(
+      (page) => page.title === META_CATEGORY_LIST_NAME
+    );
+    if (!categoryListPage) {
       return null;
     }
 
-    const parsed = await reader?.getWorkspacePageContent(page.id, true);
+    const parsed = await reader?.getWorkspacePageContent(
+      categoryListPage.id,
+      true
+    );
     if (!parsed) {
       return null;
     }
@@ -201,73 +209,96 @@ export function instantiateReader({
       return null;
     }
 
-    // get all database blocks
-    const databaseBlocks = parsed.parsedBlocks?.filter(
-      (block): block is DatabaseBlock => block.flavour === "affine:database"
+    const [categoryListDatabase] = getDatabaseBlock(
+      parsedBlocks,
+      META_CATEGORY_DATABASE_NAME
     );
 
-    if (!databaseBlocks) {
+    if (!categoryListDatabase) {
       return null;
     }
 
-    // id -> template
-    const cache = new Map<string, Template>();
+    const categoryPages = _reader
+      .getLinkedPageIdsFromMarkdown(categoryListDatabase.content)
+      .map((p) => pageMetas.find((m) => m.id === p.id))
+      .filter((p) => p !== undefined);
 
-    // database title is the category
-    const parseDatabase = async (block: DatabaseBlock) => {
-      const templates: Template[] = [];
-
-      for (const { id } of _reader.getLinkedPageIdsFromMarkdown(
-        block.content
-      )) {
-        if (cache.has(id)) {
-          templates.push(cache.get(id)!);
-          continue;
-        }
-
-        const page = await _reader.getWorkspacePageContent(id);
-        if (!page) {
-          continue;
-        }
-        const template = await postprocessTemplate(page);
-        if (template) {
-          templates.push(template);
-          cache.set(id, template);
-        }
-      }
-
-      return {
-        category: block.title,
-        list: templates,
-        featured: templates[0],
-      };
-    };
-
-    const categories: TemplateCategory[] = [];
-
-    for (let i = 0; i < parsedBlocks.length; i++) {
-      const block = parsedBlocks[i];
-      if (block.flavour === "affine:database") {
-        const category = await parseDatabase(block as DatabaseBlock);
-        const description = await getCategoryDescription(parsedBlocks, i);
-        categories.push({
-          ...category,
-          title: description.title,
-          description: description.md,
-          slug: category.category.toLocaleLowerCase().replaceAll(" ", "-"),
-        });
-      }
+    if (!categoryPages) {
+      return null;
     }
 
     return {
-      categories,
-      templateListPageId: page.id,
+      categoryPages,
+      templateListPageId: categoryListPage.id,
     };
+  }
+
+  async function getCategory(categoryPageId: string): Promise<{
+    description: string; // markdown
+    title: string;
+    pages: Blog.WorkspacePage[];
+  } | null> {
+    const pageMetas = await reader?.getDocPageMetas();
+    if (!pageMetas) {
+      return null;
+    }
+
+    const categoryPage = await reader?.getWorkspacePageContent(categoryPageId);
+    if (!categoryPage || !categoryPage.parsedBlocks) {
+      return null;
+    }
+
+    const [templateListDatabase, nextIndex] = getDatabaseBlock(
+      categoryPage.parsedBlocks
+    );
+    if (!templateListDatabase) {
+      return null;
+    }
+
+    const templateList = _reader
+      .getLinkedPageIdsFromMarkdown(templateListDatabase.content)
+      .map((p) => pageMetas.find((m) => m.id === p.id))
+      .filter((p) => p !== undefined);
+
+    const description = await getCategoryDescription(
+      categoryPage.parsedBlocks,
+      nextIndex
+    );
+
+    return {
+      description: description.md,
+      title: templateListDatabase.title,
+      pages: templateList,
+    };
+  }
+
+  // id -> template
+  const templateCache = new Map<string, Template>();
+
+  async function getTemplate(templateId: string): Promise<Template | null> {
+    if (templateCache.has(templateId)) {
+      return templateCache.get(templateId)!;
+    }
+
+    const template = await reader?.getWorkspacePageContent(templateId);
+    if (!template) {
+      return null;
+    }
+
+    const processed = await postprocessTemplate(template);
+    if (!processed) {
+      return null;
+    }
+
+    templateCache.set(templateId, processed);
+    return processed;
   }
 
   return {
     ...reader,
-    getTemplateList,
+    getCategoryList,
+    getCategory,
+    getTemplate,
     postprocessTemplate,
   };
 }

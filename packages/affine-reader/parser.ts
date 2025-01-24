@@ -419,6 +419,16 @@ export const workspaceDocToPagesMeta = (
     const space = spaces["space:" + page.id] || spaces[page.id];
     page.guid = space.guid;
     page.properties = propertiesDoc?.getMap(page.id).toJSON();
+    page.properties = Object.assign({}, page.properties, {
+      // @ts-ignore
+      tags: page.tags
+        ?.map(
+          (t: string) =>
+            meta.properties?.tags?.options.find((tag: any) => tag.id === t)
+              ?.value
+        )
+        .filter((t: string | undefined) => !!t),
+    });
   });
   return pages;
 };

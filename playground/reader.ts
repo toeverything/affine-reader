@@ -1,4 +1,4 @@
-import * as templateReader from "affine-reader/template";
+import * as templateReader from "affine-reader/template-v2";
 
 import assert from "assert";
 

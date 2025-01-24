@@ -1,6 +1,6 @@
 {
   "name": "affine-reader",
-  "version": "3.4.5",
+  "version": "3.5.0",
   "description": "A simple reader for the blocksuite format",
   "scripts": {
     "test": "vitest",
@@ -31,7 +31,8 @@
   "exports": {
     ".": "./index.ts",
     "./blog": "./blog.ts",
-    "./template": "./template.ts"
+    "./template": "./template.ts",
+    "./template-v2": "./template-v2.ts"
   },
   "publishConfig": {
     "access": "public",
@@ -47,6 +48,10 @@
       "./template": {
         "import": "./dist/template.js",
         "types": "./dist/template.d.ts"
+      },
+      "./template-v2": {
+        "import": "./dist/template-v2.js",
+        "types": "./dist/template-v2.d.ts"
       }
     }
   },

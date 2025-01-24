@@ -223,7 +223,7 @@ export function instantiateReader({
 
     const linkedPageIds = getLinkedPageIdsFromMarkdown(parsedDoc.md);
 
-    const relatedBlogsBlock = getDatabaseBlock(blocks, "Related Blogs");
+    const [relatedBlogsBlock] = getDatabaseBlock(blocks, "Related Blogs");
 
     const relatedBlogIds = relatedBlogsBlock
       ? getLinkedPageIdsFromMarkdown(relatedBlogsBlock.content)
@@ -243,9 +243,6 @@ export function instantiateReader({
       flavour: "affine:page",
       children: validChildren,
     });
-
-    // @ts-ignore
-    delete docMeta["tags"];
 
     Object.assign(result, docMeta);
 

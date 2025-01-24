@@ -113,8 +113,12 @@ function DocPreviewEditorImpl({
   return (
     <div className={styles.app}>
       <EditorContext.Provider value={{ editor, collection }}>
-        <EditorContainer />
-        {page ? <PageRenderer page={page} /> : <div>Loading...</div>}
+        <EditorContainer style={{ width: "50%" }} />
+        {page ? (
+          <PageRenderer page={page} style={{ width: "50%" }} />
+        ) : (
+          <div>Loading...</div>
+        )}
       </EditorContext.Provider>
     </div>
   );

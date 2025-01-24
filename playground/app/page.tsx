@@ -6,7 +6,7 @@ export default async function Home() {
   const pages = await reader.getDocPageMetas();
   return (
     <main>
-      <Link href={"/template"}>
+      <Link href={"/templates"}>
         <h3>Click me to view the template list</h3>
       </Link>
       <WorkspaceRenderer pages={pages} />
