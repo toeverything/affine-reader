@@ -1,12 +1,12 @@
 {
   "name": "affine-reader",
-  "version": "3.5.1",
+  "version": "3.5.2",
   "description": "A simple reader for the blocksuite format",
   "scripts": {
     "test": "vitest",
     "build": "pnpm bundle && pnpm dts",
     "bundle": "node esbuild.config.js",
-    "dts": "tsup --entry index.ts --entry blog.ts --entry template.ts --dts-only --format esm",
+    "dts": "tsup --entry index.ts --entry blog.ts --entry template.ts --entry template-v2.ts --dts-only --format esm",
     "prepublish": "pnpm build && cp ../../README.md dist/README.md"
   },
   "devDependencies": {
