@@ -113,7 +113,7 @@ export function instantiateReader({
 
     const relatedTemplates = relatedTemplatesBlock
       ? (await getLinkedPagesFromDatabase(relatedTemplatesBlock)).map(
-          (p) => p.id
+          (p) => p.slug
         )
       : [];
 
