@@ -16,7 +16,7 @@ function TemplateList({ categoryPage }: { categoryPage: WorkspacePage }) {
         padding: 16,
       }}
     >
-      <legend>{categoryPage.title}</legend>
+      <legend style={{ position: "sticky", top: 0 }}>{category.title}</legend>
       <WorkspaceRenderer template pages={category.pages} />
       <pre
         style={{
@@ -25,7 +25,6 @@ function TemplateList({ categoryPage }: { categoryPage: WorkspacePage }) {
       >
         <code>{category.description}</code>
       </pre>
-      <hr />
     </fieldset>
   );
 }

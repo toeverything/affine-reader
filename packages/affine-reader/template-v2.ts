@@ -236,6 +236,7 @@ export function instantiateReader({
   async function getCategory(categoryPageId: string): Promise<{
     description: string; // markdown
     title: string;
+    name: string;
     pages: Blog.WorkspacePage[];
   } | null> {
     const pageMetas = await reader?.getDocPageMetas();
@@ -267,7 +268,8 @@ export function instantiateReader({
 
     return {
       description: description.md,
-      title: templateListDatabase.title,
+      title: description.title,
+      name: templateListDatabase.title,
       pages: templateList,
     };
   }
