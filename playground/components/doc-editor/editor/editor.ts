@@ -70,5 +70,8 @@ export function initEditor(
   const editor = new AffineEditorContainer();
   editor.doc = doc;
 
+  // @ts-ignore
+  window.editor = editor;
+
   return { editor, collection, doc };
 }

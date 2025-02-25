@@ -87,6 +87,12 @@ export interface DatabaseBlock extends BaseParsedBlock {
   rows: Record<string, string>[];
 }
 
+export interface TableBlock extends BaseParsedBlock {
+  flavour: "affine:table";
+  rows: string[][];
+  columns: string[];
+}
+
 export type ParsedBlock =
   | ParagraphBlock
   | DividerBlock
@@ -97,6 +103,7 @@ export type ParsedBlock =
   | EmbedYoutubeBlock
   | BookmarkBlock
   | DatabaseBlock
+  | TableBlock
   | BaseParsedBlock;
 
 export type SerializedCells = {
@@ -371,6 +378,80 @@ export function parseBlock(
           rows: dbRows.map((row) => {
             return Object.fromEntries(row.map((v, i) => [cols[i].name, v]));
           }),
+        });
+        break;
+      }
+      case "affine:table": {
+        // Extract row IDs and their order
+        const rowEntries = Object.entries(yBlock.toJSON())
+          .filter(
+            ([key]) => key.startsWith("prop:rows.") && key.endsWith(".rowId")
+          )
+          .map(([key, value]) => {
+            const rowId = value as string;
+            const orderKey = key.replace(".rowId", ".order");
+            const order = yBlock.get(orderKey) as string;
+            const backgroundColor = yBlock.get(
+              key.replace(".rowId", ".backgroundColor")
+            ) as string | undefined;
+            return { rowId, order, backgroundColor };
+          })
+          .sort((a, b) => a.order.localeCompare(b.order));
+
+        // Extract column IDs and their order
+        const columnEntries = Object.entries(yBlock.toJSON())
+          .filter(
+            ([key]) =>
+              key.startsWith("prop:columns.") && key.endsWith(".columnId")
+          )
+          .map(([key, value]) => {
+            const columnId = value as string;
+            const orderKey = key.replace(".columnId", ".order");
+            const order = yBlock.get(orderKey) as string;
+            return { columnId, order };
+          })
+          .sort((a, b) => a.order.localeCompare(b.order));
+
+        // Build the table rows with cell data
+        const tableRows = rowEntries.map(({ rowId }) => {
+          return columnEntries.map(({ columnId }) => {
+            const cellKey = `prop:cells.${rowId}:${columnId}.text`;
+            const cellText = yBlock.get(cellKey) as string | undefined;
+            return cellText || "";
+          });
+        });
+
+        // Store column IDs for reference
+        const columnIds = columnEntries.map(({ columnId }) => columnId);
+
+        // Use the first row as header and the rest as data rows
+        if (tableRows.length > 0) {
+          const headerRow = tableRows[0];
+          const dataRows = tableRows.slice(1);
+          const separators = headerRow.map(() => "---");
+
+          // Convert to markdown table with first row as header
+          result.content =
+            [headerRow, separators, ...dataRows]
+              .map((row) => {
+                return (
+                  "|" +
+                  row
+                    .map((cell) => String(cell || "")?.trim())
+                    .join("|")
+                    .replace(/\n+/g, "<br />") +
+                  "|"
+                );
+              })
+              .join("\n") + "\n\n";
+        } else {
+          // Handle empty table case
+          result.content = "";
+        }
+
+        Object.assign(result, {
+          columns: columnIds,
+          rows: tableRows,
         });
         break;
       }

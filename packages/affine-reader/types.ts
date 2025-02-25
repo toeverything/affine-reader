@@ -16,6 +16,7 @@ export type Flavour = BaseFlavour<
   | "image"
   | "surface"
   | "database"
+  | "table"
   | "attachment"
   | "bookmark"
   | "embed-youtube"
