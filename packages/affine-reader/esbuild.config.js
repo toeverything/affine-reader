@@ -5,7 +5,8 @@ build({
   bundle: true,
   platform: "node",
   outdir: "dist",
+  target: "es2015",
   sourcemap: true,
   format: "esm",
-  external: ["yjs", "@blocksuite/*"],
+  external: ["yjs"],
 });

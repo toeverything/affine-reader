@@ -1,10 +1,10 @@
 import * as Y from "yjs";
 import { deltaToMd } from "delta-to-md";
-import type { Column, Cell } from "@blocksuite/blocks";
 
 import { html } from "common-tags";
 
 import type { YBlock, YBlocks, Flavour, WorkspacePage } from "./types";
+import { Cell, Column } from "@blocksuite/affine/model";
 
 export interface BlockToMdContext {
   target: string;

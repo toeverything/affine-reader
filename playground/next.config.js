@@ -4,9 +4,11 @@ const nextConfig = {
     swcMinify: true,
   },
   typescript: {
-    ignoreBuildErrors: true,
+    // Don't ignore build errors to catch module resolution issues
+    ignoreBuildErrors: false,
   },
   reactStrictMode: false,
+  transpilePackages: [],
 };
 
 module.exports = nextConfig;

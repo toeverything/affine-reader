@@ -10,6 +10,9 @@
     "prepublish": "pnpm build && cp ../../README.md dist/README.md"
   },
   "devDependencies": {
+    "@blocksuite/affine": "^0.20.0",
+    "@blocksuite/affine-shared": "^0.20.0",
+    "@blocksuite/store": "^0.20.0",
     "@types/common-tags": "^1.8.4",
     "common-tags": "^1.8.2",
     "delta-to-md": "workspace:*",
@@ -20,39 +23,26 @@
     "vitest": "^2.0.5"
   },
   "dependencies": {
-    "@blocksuite/affine": "^0.17.27",
-    "@blocksuite/blocks": "^0.17.27",
-    "@blocksuite/presets": "^0.17.27",
-    "@blocksuite/store": "^0.17.27",
     "fflate": "^0.8.2",
-    "yjs": "^13.6.18"
+    "yjs": "^13.6.24"
   },
   "type": "module",
   "exports": {
-    ".": "./index.ts",
-    "./blog": "./blog.ts",
-    "./template": "./template.ts",
-    "./template-v2": "./template-v2.ts"
-  },
-  "publishConfig": {
-    "access": "public",
-    "exports": {
-      ".": {
-        "import": "./dist/index.js",
-        "types": "./dist/index.d.ts"
-      },
-      "./blog": {
-        "import": "./dist/blog.js",
-        "types": "./dist/blog.d.ts"
-      },
-      "./template": {
-        "import": "./dist/template.js",
-        "types": "./dist/template.d.ts"
-      },
-      "./template-v2": {
-        "import": "./dist/template-v2.js",
-        "types": "./dist/template-v2.d.ts"
-      }
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./blog": {
+      "import": "./dist/blog.js",
+      "types": "./dist/blog.d.ts"
+    },
+    "./template": {
+      "import": "./dist/template.js",
+      "types": "./dist/template.d.ts"
+    },
+    "./template-v2": {
+      "import": "./dist/template-v2.js",
+      "types": "./dist/template-v2.d.ts"
     }
   },
   "files": [
