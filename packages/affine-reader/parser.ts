@@ -1,10 +1,10 @@
 import * as Y from "yjs";
 import { deltaToMd } from "delta-to-md";
-import type { Column, Cell } from "@blocksuite/blocks";
 
 import { html } from "common-tags";
 
 import type { YBlock, YBlocks, Flavour, WorkspacePage } from "./types";
+import { CellDataType, ColumnDataType } from "@blocksuite/affine/model";
 
 export interface BlockToMdContext {
   target: string;
@@ -110,7 +110,7 @@ export type SerializedCells = {
   // row
   [key: string]: {
     // column
-    [key: string]: Cell;
+    [key: string]: CellDataType;
   };
 };
 
@@ -309,8 +309,8 @@ export function parseBlock(
           })
         );
         const cols = (
-          yBlock.get("prop:columns") as Y.Array<Column>
-        ).toJSON() as Column[];
+          yBlock.get("prop:columns") as Y.Array<ColumnDataType>
+        ).toJSON() as ColumnDataType[];
 
         const cells = (
           yBlock.get("prop:cells") as Y.Map<SerializedCells>

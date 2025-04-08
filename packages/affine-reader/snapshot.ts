@@ -1,16 +1,25 @@
+import * as fflate from "fflate";
 import {
-  Doc,
-  DocCollection,
+  replaceIdMiddleware,
+  titleMiddleware,
+} from "@blocksuite/affine-shared/adapters";
+import { AffineSchemas } from "@blocksuite/affine/schemas";
+import {
+  registerStoreSpecs,
+  registerBlockSpecs,
+} from "@blocksuite/affine/extensions";
+import { applyUpdate } from "yjs";
+import {
   DocSnapshot,
   getAssetName,
-  Job,
-} from "@blocksuite/store";
+  Schema,
+  Store,
+  Transformer,
+  Workspace,
+} from "@blocksuite/affine/store";
 
-import * as fflate from "fflate";
-
-import { AffineSchemas } from "@blocksuite/affine/blocks/schemas";
-import { Schema } from "@blocksuite/store";
-import { applyUpdate } from "yjs";
+import { TestWorkspace } from "@blocksuite/store/test";
+import { SpecProvider } from "@blocksuite/affine-shared/utils";
 
 class Zip {
   private compressed = new Uint8Array();
@@ -69,32 +78,68 @@ class Zip {
   }
 }
 
-async function exportDocs(collection: DocCollection, docs: Doc[]) {
-  const zip = new Zip();
-  const job = new Job({ collection });
-  const snapshots = await Promise.all(
-    docs.map((doc) => job.docToSnapshot(doc))
-  );
+registerStoreSpecs();
+registerBlockSpecs();
 
-  const collectionInfo = job.collectionInfoToSnapshot();
-  await zip.file("info.json", JSON.stringify(collectionInfo, null, 2));
+async function exportDocs(
+  collection: Workspace,
+  schema: Schema,
+  docs: Store[]
+) {
+  const zip = new Zip();
+  const job = new Transformer({
+    schema,
+    blobCRUD: collection.blobSync,
+    docCRUD: {
+      create: (id: string) => collection.createDoc(id).getStore(),
+      get: (id: string) => collection.getDoc(id)?.getStore() ?? null,
+      delete: (id: string) => collection.removeDoc(id),
+    },
+    middlewares: [
+      replaceIdMiddleware(collection.idGenerator),
+      titleMiddleware(collection.meta.docMetas),
+    ],
+  });
+  const snapshots = await Promise.all(docs.map(job.docToSnapshot));
 
   await Promise.all(
     snapshots
       .filter((snapshot): snapshot is DocSnapshot => !!snapshot)
       .map(async (snapshot) => {
-        const snapshotName = `${snapshot.meta.id}.snapshot.json`;
+        // Use the title and id as the snapshot file name
+        const title = snapshot.meta.title || "untitled";
+        const id = snapshot.meta.id;
+        const snapshotName = `${title}-${id}.snapshot.json`;
         await zip.file(snapshotName, JSON.stringify(snapshot, null, 2));
       })
   );
 
   const assets = zip.folder("assets");
+  const pathBlobIdMap = job.assetsManager.getPathBlobIdMap();
   const assetsMap = job.assets;
 
-  for (const [id, blob] of assetsMap) {
-    const ext = getAssetName(assetsMap, id).split(".").at(-1);
-    const name = `${id}.${ext}`;
-    await assets.file(name, blob);
+  // Add blobs to assets folder, if failed, log the error and continue
+  const results = await Promise.all(
+    Array.from(pathBlobIdMap.values()).map(async (blobId) => {
+      try {
+        await job.assetsManager.readFromBlob(blobId);
+        const ext = getAssetName(assetsMap, blobId).split(".").at(-1);
+        const blob = assetsMap.get(blobId);
+        if (blob) {
+          await assets.file(`${blobId}.${ext}`, blob);
+          return { success: true, blobId };
+        }
+        return { success: false, blobId, error: "Blob not found" };
+      } catch (error) {
+        console.error(`Failed to process blob: ${blobId}`, error);
+        return { success: false, blobId, error };
+      }
+    })
+  );
+
+  const failures = results.filter((r) => !r.success);
+  if (failures.length > 0) {
+    console.warn(`Failed to process ${failures.length} blobs:`, failures);
   }
 
   return await zip.generate();
@@ -110,13 +155,9 @@ export const getDocSnapshotFromBin = async (
   docBin: ArrayBuffer,
   getBlob: (id: string) => Promise<Blob | null>
 ) => {
-  const globalBlockSuiteSchema = new Schema();
-
-  globalBlockSuiteSchema.register(AffineSchemas);
-
-  const docCollection = new DocCollection({
+  const globalBlockSuiteSchema = new Schema().register(AffineSchemas);
+  const docCollection = new TestWorkspace({
     id: "test",
-    schema: globalBlockSuiteSchema,
     blobSources: {
       main: {
         name: "main",
@@ -133,17 +174,20 @@ export const getDocSnapshotFromBin = async (
     },
   });
   docCollection.meta.initialize();
+  docCollection.storeExtensions = SpecProvider._.getSpec("store").value;
 
-  const doc = docCollection.createDoc({
-    id: docId,
-  });
-  doc.awarenessStore.setReadonly(doc.blockCollection, true);
+  const doc = docCollection.createDoc(docId);
 
   const spaceDoc = doc.spaceDoc;
   doc.load(() => {
     applyUpdate(spaceDoc, new Uint8Array(docBin));
-    docCollection.schema.upgradeDoc(0, {}, spaceDoc);
   });
 
-  return await exportDocs(docCollection, [doc]);
+  return await exportDocs(
+    docCollection,
+    globalBlockSuiteSchema,
+    Array.from(docCollection.docs.values()).map((collection) =>
+      collection.getStore()
+    )
+  );
 };

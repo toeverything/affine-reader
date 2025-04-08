@@ -1,17 +1,5 @@
-"use client";
-
-import dynamic from "next/dynamic";
+import { DocPreviewEditor } from "@/components/doc-editor/doc-editor";
 import Link from "next/link";
-
-const DocPreviewEditor = dynamic(
-  () =>
-    import("@/components/doc-editor/doc-editor").then(
-      (mod) => mod.DocPreviewEditor
-    ),
-  {
-    ssr: false,
-  }
-);
 
 export default function DocPreviewEditorPage({
   params,
@@ -28,6 +16,7 @@ export default function DocPreviewEditorPage({
         <h3>back to template list</h3>
       </Link>
 
+      {/* @ts-expect-error Async Server Component */}
       <DocPreviewEditor docId={params.docId} template />
     </main>
   );
