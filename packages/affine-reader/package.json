@@ -10,10 +10,11 @@
     "prepublish": "pnpm build && cp ../../README.md dist/README.md"
   },
   "devDependencies": {
-    "@blocksuite/affine": "^0.20.0",
-    "@blocksuite/affine-shared": "^0.20.0",
-    "@blocksuite/store": "^0.20.0",
+    "@blocksuite/affine": "^0.21.0",
+    "@blocksuite/affine-shared": "^0.21.0",
+    "@blocksuite/store": "^0.21.0",
     "@types/common-tags": "^1.8.4",
+    "@vanilla-extract/esbuild-plugin": "^2.3.15",
     "common-tags": "^1.8.2",
     "delta-to-md": "workspace:*",
     "esbuild": "^0.23.0",

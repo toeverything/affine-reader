@@ -4,6 +4,10 @@ import {
   titleMiddleware,
 } from "@blocksuite/affine-shared/adapters";
 import { AffineSchemas } from "@blocksuite/affine/schemas";
+import {
+  registerStoreSpecs,
+  registerBlockSpecs,
+} from "@blocksuite/affine/extensions";
 import { applyUpdate } from "yjs";
 import {
   DocSnapshot,
@@ -15,6 +19,7 @@ import {
 } from "@blocksuite/affine/store";
 
 import { TestWorkspace } from "@blocksuite/store/test";
+import { SpecProvider } from "@blocksuite/affine-shared/utils";
 
 class Zip {
   private compressed = new Uint8Array();
@@ -73,6 +78,9 @@ class Zip {
   }
 }
 
+registerStoreSpecs();
+registerBlockSpecs();
+
 async function exportDocs(
   collection: Workspace,
   schema: Schema,
@@ -83,8 +91,8 @@ async function exportDocs(
     schema,
     blobCRUD: collection.blobSync,
     docCRUD: {
-      create: (id: string) => collection.createDoc({ id }),
-      get: (id: string) => collection.getDoc(id),
+      create: (id: string) => collection.createDoc(id).getStore(),
+      get: (id: string) => collection.getDoc(id)?.getStore() ?? null,
       delete: (id: string) => collection.removeDoc(id),
     },
     middlewares: [
@@ -147,8 +155,7 @@ export const getDocSnapshotFromBin = async (
   docBin: ArrayBuffer,
   getBlob: (id: string) => Promise<Blob | null>
 ) => {
-  const globalBlockSuiteSchema = new Schema();
-  globalBlockSuiteSchema.register(AffineSchemas);
+  const globalBlockSuiteSchema = new Schema().register(AffineSchemas);
   const docCollection = new TestWorkspace({
     id: "test",
     blobSources: {
@@ -167,15 +174,20 @@ export const getDocSnapshotFromBin = async (
     },
   });
   docCollection.meta.initialize();
+  docCollection.storeExtensions = SpecProvider._.getSpec("store").value;
 
-  const doc = docCollection.createDoc({
-    id: docId,
-  });
+  const doc = docCollection.createDoc(docId);
 
   const spaceDoc = doc.spaceDoc;
   doc.load(() => {
     applyUpdate(spaceDoc, new Uint8Array(docBin));
   });
 
-  return await exportDocs(docCollection, globalBlockSuiteSchema, [doc]);
+  return await exportDocs(
+    docCollection,
+    globalBlockSuiteSchema,
+    Array.from(docCollection.docs.values()).map((collection) =>
+      collection.getStore()
+    )
+  );
 };
