@@ -7,13 +7,13 @@ const reader = getBlocksuiteReader({
 });
 
 async function main() {
-  const pages = await reader.getDocPageMetas();
+  // const pages = await reader.getDocPageMetas();
 
-  if (!pages) {
-    return;
-  }
+  // if (!pages) {
+  //   return;
+  // }
 
-  await reader.getDocSnapshot("s_9N3Eoq9_NWmjCS875by");
+  await reader.getDocSnapshot("pcT2Q-QP_V");
 
   // pages.forEach((page) => {
   //   console.log(page.title, page.id);
