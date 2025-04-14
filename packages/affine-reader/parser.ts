@@ -119,12 +119,15 @@ export const parseBlockToMd = (
   padding = ""
 ): string => {
   if (block.content) {
-    return (
-      padding +
+    const nested =
       block.content +
       "\n" +
-      block.children.map((b) => parseBlockToMd(b, padding + "  ")).join("")
-    );
+      block.children.map((b) => parseBlockToMd(b, padding + "  ")).join("");
+
+    return nested
+      .split("\n")
+      .map((line) => padding + line)
+      .join("\n");
   } else {
     return block.children.map((b) => parseBlockToMd(b, padding)).join("");
   }
