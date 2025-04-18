@@ -195,7 +195,8 @@ export function parseBlock(
         break;
       }
       case "affine:code": {
-        const lang = (yBlock.get("prop:language") as string).toLowerCase();
+        const lang =
+          (yBlock.get("prop:language") as string)?.toLowerCase() || "";
         // do not transform to delta for code block
         result.content =
           "```" +
