@@ -214,15 +214,15 @@ export function parseBlock(
         const blobUrl = context.blobUrlHandler(sourceId);
         const caption = yBlock.get("prop:caption") as string;
         if (width || height || caption) {
-          // prettier-ignore
-          result.content = html`
-            <img
-              src="${blobUrl}"
-              alt="${caption}"
-              width="${width || "auto"}"
-              height="${height || "auto"}"
-            />\n\n
-          `;
+          result.content =
+            html`
+              <img
+                src="${blobUrl}"
+                alt="${caption}"
+                width="${width || "auto"}"
+                height="${height || "auto"}"
+              />
+            ` + "\n\n";
         } else {
           result.content = `\n![${sourceId}](${blobUrl})\n\n`;
         }
