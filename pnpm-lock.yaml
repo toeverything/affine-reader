@@ -20,6 +20,13 @@ importers:
       affine-reader:
         specifier: workspace:*
         version: link:../packages/affine-reader
+    devDependencies:
+      '@vanilla-extract/css':
+        specifier: ^1.17.1
+        version: 1.17.1
+      '@vanilla-extract/integration':
+        specifier: ^8.0.1
+        version: 8.0.1
 
   packages/affine-reader:
     dependencies:
@@ -42,9 +49,9 @@ importers:
       '@types/common-tags':
         specifier: ^1.8.4
         version: 1.8.4
-      '@vanilla-extract/esbuild-plugin':
-        specifier: ^2.3.15
-        version: 2.3.15(esbuild@0.23.1)
+      '@vanilla-extract/css':
+        specifier: ^1.17.1
+        version: 1.17.1
       common-tags:
         specifier: ^1.8.2
         version: 1.8.2
@@ -1157,14 +1164,6 @@ packages:
 
   '@vanilla-extract/css@1.17.1':
     resolution: {integrity: sha512-tOHQXHm10FrJeXKFeWE09JfDGN/tvV6mbjwoNB9k03u930Vg021vTnbrCwVLkECj9Zvh/SHLBHJ4r2flGqfovw==}
-
-  '@vanilla-extract/esbuild-plugin@2.3.15':
-    resolution: {integrity: sha512-Kgq86janU5KwAfHy4DuPYhY/WJQN5yRht3OntnKpC7NUL4R5BJeiLcmTY6oeRUlcGnrrDfWEfc4fbxJxD8PDXQ==}
-    peerDependencies:
-      esbuild: '>=0.17.6'
-    peerDependenciesMeta:
-      esbuild:
-        optional: true
 
   '@vanilla-extract/integration@8.0.1':
     resolution: {integrity: sha512-ag64t+AM96XGOiloc5ryZHP5rbfleFyfoPKa42QqOuyAlLx/UpW5epSY+RUldizP4P/uLy5WFRiYlNddK1eQUQ==}
@@ -2633,7 +2632,7 @@ snapshots:
     dependencies:
       '@babel/helper-validator-identifier': 7.25.9
       js-tokens: 4.0.0
-      picocolors: 1.1.0
+      picocolors: 1.1.1
 
   '@babel/compat-data@7.26.8': {}
 
@@ -4822,18 +4821,9 @@ snapshots:
       lru-cache: 10.4.3
       media-query-parser: 2.0.2
       modern-ahocorasick: 1.1.0
-      picocolors: 1.1.0
+      picocolors: 1.1.1
     transitivePeerDependencies:
       - babel-plugin-macros
-
-  '@vanilla-extract/esbuild-plugin@2.3.15(esbuild@0.23.1)':
-    dependencies:
-      '@vanilla-extract/integration': 8.0.1
-    optionalDependencies:
-      esbuild: 0.23.1
-    transitivePeerDependencies:
-      - babel-plugin-macros
-      - supports-color
 
   '@vanilla-extract/integration@8.0.1':
     dependencies:
@@ -6087,7 +6077,7 @@ snapshots:
   postcss@8.4.45:
     dependencies:
       nanoid: 3.3.7
-      picocolors: 1.1.0
+      picocolors: 1.1.1
       source-map-js: 1.2.1
 
   property-information@6.5.0: {}

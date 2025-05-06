@@ -1,5 +1,4 @@
 import { build } from "esbuild";
-import { vanillaExtractPlugin } from "@vanilla-extract/esbuild-plugin";
 
 build({
   entryPoints: ["./index.ts", "./blog.ts", "./template.ts", "./template-v2.ts"],
@@ -10,5 +9,4 @@ build({
   sourcemap: true,
   format: "esm",
   external: ["yjs"],
-  plugins: [vanillaExtractPlugin()],
 });
