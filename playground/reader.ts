@@ -9,5 +9,5 @@ export const reader = templateReader.instantiateReader({
   target:
     process.env.NODE_ENV === "development"
       ? "http://localhost:3000"
-      : "https://affine-reader.vercel.app/",
+      : "https://affine-reader.vercel.app",
 });

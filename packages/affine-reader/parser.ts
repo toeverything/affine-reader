@@ -6,6 +6,13 @@ import { html } from "common-tags";
 import type { YBlock, YBlocks, Flavour, WorkspacePage } from "./types";
 import { CellDataType, ColumnDataType } from "@blocksuite/affine/model";
 
+export interface ParserContext {
+  workspaceId: string
+  doc: Y.Doc;
+  buildBlobUrl: (blobId: string) => string;
+  buildDocUrl: (docId: string) => string;
+}
+
 export interface BlockToMdContext {
   target: string;
   workspaceId: string;
@@ -133,7 +140,7 @@ export const parseBlockToMd = (
 };
 
 export function parseBlock(
-  context: BlockToMdContext,
+  context: ParserContext,
   yBlock: YBlock | undefined,
   yBlocks: YBlocks // all blocks
 ): ParsedBlock | null {
@@ -198,9 +205,11 @@ export function parseBlock(
         const lang =
           (yBlock.get("prop:language") as string)?.toLowerCase() || "";
         // do not transform to delta for code block
+        const caption = yBlock.get("prop:caption") as string;
         result.content =
           "```" +
           lang +
+          (caption ? ` ${caption}` : "") +
           "\n" +
           (yBlock.get("prop:text") as Y.Text).toJSON() +
           "\n```\n\n";
@@ -211,7 +220,7 @@ export function parseBlock(
         const width = yBlock.get("prop:width");
         const height = yBlock.get("prop:height");
         // fixme: this may not work if workspace is not public
-        const blobUrl = context.blobUrlHandler(sourceId);
+        const blobUrl = context.buildBlobUrl(sourceId);
         const caption = yBlock.get("prop:caption") as string;
         if (width || height || caption) {
           result.content =
@@ -224,7 +233,7 @@ export function parseBlock(
               />
             ` + "\n\n";
         } else {
-          result.content = `\n![${sourceId}](${blobUrl})\n\n`;
+          result.content = `\n![${caption || sourceId}](${blobUrl})\n\n`;
         }
         Object.assign(result, {
           sourceId,
@@ -238,8 +247,8 @@ export function parseBlock(
       }
       case "affine:attachment": {
         const sourceId = yBlock.get("prop:sourceId") as string;
-        // fixme: this may not work if workspace is not public
-        const blobUrl = context.blobUrlHandler(sourceId);
+        const blobUrl = context.buildBlobUrl(sourceId);
+        const caption = yBlock.get("prop:caption") as string;
         if (type.startsWith("video")) {
           result.content =
             html`
@@ -249,11 +258,12 @@ export function parseBlock(
             ` + "\n\n";
         } else {
           // assume it is an image
-          result.content = `\n![${sourceId}](${blobUrl})\n\n`;
+          result.content = `\n![${caption || sourceId}](${blobUrl})\n\n`;
         }
         Object.assign(result, {
           sourceId,
           blobUrl,
+          caption,
         });
         break;
       }
@@ -275,18 +285,22 @@ export function parseBlock(
       }
       case "affine:bookmark": {
         const url = yBlock.get("prop:url") as string;
+        const caption = yBlock.get("prop:caption") as string;
         result.content = `\n[](Bookmark,${url})\n\n`;
         Object.assign(result, {
           url,
+          caption,
         });
         break;
       }
       case "affine:embed-linked-doc":
       case "affine:embed-synced-doc": {
         const pageId = yBlock.get("prop:pageId") as string;
-        result.content = `\n[](LinkedPage:${pageId})\n\n`;
+        const caption = yBlock.get("prop:caption") as string;
+        result.content = `\n[${caption}](${context.buildDocUrl(pageId)})\n\n`;
         Object.assign(result, {
           pageId,
+          caption,
         });
         break;
       }
@@ -519,13 +533,10 @@ export const workspaceDocToPagesMeta = (
 };
 
 export const parsePageDoc = (
-  workspaceId: string,
-  target: string,
-  pageDoc: Y.Doc,
-  blobUrlHandler: (blobId: string) => string
+  ctx: ParserContext,
 ): ParsedDoc => {
   // we assume that the first block is the page block
-  const yBlocks: YBlocks = pageDoc.getMap("blocks");
+  const yBlocks: YBlocks = ctx.doc.getMap("blocks");
   const maybePageBlock = Object.entries(yBlocks.toJSON()).findLast(
     ([_, b]) => b["sys:flavour"] === "affine:page"
   );
@@ -539,13 +550,7 @@ export const parsePageDoc = (
   } else {
     const yPage = yBlocks.get(maybePageBlock[0]) as YBlock;
     const title = yPage.get("prop:title") as Y.Text;
-    const context = {
-      target,
-      workspaceId,
-      docId: pageDoc.guid,
-      blobUrlHandler,
-    };
-    const rootBlock = parseBlock(context, yPage, yBlocks);
+    const rootBlock = parseBlock(ctx, yPage, yBlocks);
     if (!rootBlock) {
       return {
         title: "",
