@@ -1,5 +1,5 @@
 import * as Y from "yjs";
-import { parsePageDoc, workspaceDocToPagesMeta } from "./parser";
+import { parsePageDoc, workspaceDocToPagesMeta, ParserContext } from "./parser";
 import { getDocSnapshotFromBin } from "./snapshot";
 
 interface ReaderConfig {
@@ -10,7 +10,11 @@ interface ReaderConfig {
   Y?: typeof Y;
   retry?: number; // retry times. if 429, retry after the given seconds in the header
   // given a blob id, return a url to the blob
+  /**
+   * @deprecated use `parser.blobUrlBuilder` instead
+   */
   blobUrlHandler?: (blobId: string) => string;
+  parser?: Partial<Pick<ParserContext, 'buildBlobUrl' | 'buildDocUrl'>>;
 }
 
 const defaultResourcesUrls = {
@@ -31,11 +35,6 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
   if (!workspaceId) {
     throw new Error("Workspace ID and target are required");
   }
-
-  const defaultBlobUrlHandler = (id: string) =>
-    defaultResourcesUrls.blob(target, workspaceId, id);
-
-  const blobUrlHandler = config.blobUrlHandler ?? defaultBlobUrlHandler;
 
   const getFetchHeaders = () => {
     const headers: HeadersInit = {};
@@ -94,7 +93,7 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
    * @returns
    */
   const getBlob = async (blobId: string) => {
-    const url = blobUrlHandler(blobId);
+    const url = defaultResourcesUrls.blob(target, workspaceId, blobId);
     try {
       const res = await fetch(url, {
         cache: "no-cache",
@@ -148,19 +147,40 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
     return pageMetas;
   };
 
+  config.parser ??= {}
+  if (!config.parser.buildBlobUrl) {
+    config.parser.buildBlobUrl = config.blobUrlHandler ??( (id: string) =>
+    defaultResourcesUrls.blob(target, workspaceId, id))
+  }
+
+  if (!config.parser.buildDocUrl) {
+    config.parser.buildDocUrl = (id: string) => {
+      return `LinkedPage:${id}`
+    }
+  }
+
+  const parseDoc = (doc: Y.Doc) => {
+    return parsePageDoc({
+      buildBlobUrl: config.parser!.buildBlobUrl!,
+      buildDocUrl: config.parser!.buildDocUrl!,
+      workspaceId,
+      doc,
+    });
+  }
+
   const getDocMarkdown = async (docId = workspaceId) => {
     const doc = await getDoc(docId);
     if (!doc) {
       return null;
     }
-    const result = parsePageDoc(workspaceId, target, doc, blobUrlHandler);
-    return result;
+
+    return parseDoc(doc);
   };
 
   return {
     target,
     workspaceId,
-    blobUrlHandler,
+    blobUrlHandler: config.parser.buildBlobUrl,
     getBlob,
     getDoc,
     getDocBinary,
@@ -168,9 +188,7 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
     getDocProperties,
     getDocPageContent: getDocMarkdown,
     getDocMarkdown,
-    parsePageDoc: (doc: Y.Doc) => {
-      return parsePageDoc(workspaceId, target, doc, blobUrlHandler);
-    },
+    parsePageDoc: parseDoc,
     workspaceDocToPagesMeta,
     getDocSnapshot: async (docId: string) => {
       const docBin = await getDocBinary(docId);
