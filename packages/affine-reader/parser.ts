@@ -11,6 +11,7 @@ export interface ParserContext {
   doc: Y.Doc;
   buildBlobUrl: (blobId: string) => string;
   buildDocUrl: (docId: string) => string;
+  renderDocTitle?: (docId: string) => string;
 }
 
 export interface BlockToMdContext {
@@ -150,7 +151,7 @@ export function parseBlock(
 
   const deltaConverters = getConverters({
     convertInlineReferenceLink: (ref) => {
-      return context.buildDocUrl(ref.pageId)
+      return `[${ref.title || context.renderDocTitle?.(ref.pageId) || ''}](${context.buildDocUrl(ref.pageId)})`
     }
   });
 
@@ -209,7 +210,7 @@ export function parseBlock(
       }
       case "affine:code": {
         const lang =
-          (yBlock.get("prop:language") as string)?.toLowerCase() || "";
+          (yBlock.get("prop:language") as string)?.toLowerCase() || "txt";
         // do not transform to delta for code block
         const caption = yBlock.get("prop:caption") as string;
         result.content =
