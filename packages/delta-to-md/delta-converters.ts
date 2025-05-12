@@ -44,7 +44,7 @@ export function getConverters(opts: ConverterOptions) {
         return ["[", "](" + url + ")"];
       },
       reference: function (reference: InlineReference) {
-        return convertInlineReferenceLink(reference);
+        return [convertInlineReferenceLink(reference), ''];
       },
       strike: function () {
         return ["~~", "~~"];
