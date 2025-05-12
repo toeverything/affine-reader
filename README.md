@@ -19,7 +19,7 @@ const reader = await getBlocksuiteReader({ workspaceId: "workspace-id" });
 const pages = await reader.getWorkspacePages(true);
 ```
 
-For a real world use case, see the [demo here](https://affine-reader.vercel.app//) and the code in [playground](./playground) directory, which integrates `affine-reader` with Next.js.
+For a real world use case, see the [demo here](https://affine-reader.vercel.app/) and the code in [playground](./playground) directory, which integrates `affine-reader` with Next.js.
 
 ## Export a affine to markdown locally
 
