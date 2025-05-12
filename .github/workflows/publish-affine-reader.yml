@@ -63,6 +63,6 @@ jobs:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Push commit
-        if: success() # Only push if publish was successful
+        if: success() && inputs.dry-run == 'false' # Only push if publish was successful and not a dry run
         run: git push
         working-directory: ./
