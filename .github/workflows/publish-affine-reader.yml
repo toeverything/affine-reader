@@ -7,6 +7,11 @@ on:
         description: "The new version number (e.g., 1.2.3)"
         required: true
         type: string
+      dry-run:
+        description: "If true, perform a dry run without actually publishing"
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   publish:
@@ -49,7 +54,12 @@ jobs:
 
       - name: Publish to npm
         working-directory: ./packages/affine-reader
-        run: pnpm publish . --no-git-checks
+        run: |
+          if [ "${{ inputs.dry-run }}" = "true" ]; then
+            pnpm publish . --no-git-checks --dry-run
+          else
+            pnpm publish . --no-git-checks
+          fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }} # Ensure this secret is set in your repository
 
