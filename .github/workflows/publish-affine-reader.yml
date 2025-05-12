@@ -18,7 +18,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write # Allow to push commits
-      # id-token: write # Needed for provenance, but not for basic npm publish with NPM_TOKEN
 
     steps:
       - name: Checkout repository
@@ -33,7 +32,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20.x
-          cache: "pnpm" # Caching pnpm can speed up subsequent runs
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -61,7 +60,7 @@ jobs:
             pnpm publish . --no-git-checks
           fi
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }} # Ensure this secret is set in your repository
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Push commit
         if: success() # Only push if publish was successful
