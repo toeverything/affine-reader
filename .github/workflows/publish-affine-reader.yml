@@ -65,6 +65,6 @@ jobs:
           fi
 
       - name: Push commit
-        if: success() && inputs.dry-run == 'false' # Only push if publish was successful and not a dry run
+        if: success() && inputs.dry-run != 'true' # Only push if publish was successful and not a dry run
         run: git push
         working-directory: ./
