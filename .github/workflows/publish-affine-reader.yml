@@ -51,6 +51,10 @@ jobs:
           git add packages/affine-reader/package.json
           git commit -m "chore(release): affine-reader@${{ inputs.version }}"
 
+      - name: Setup .npmrc file
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
+
       - name: Publish to npm
         working-directory: ./packages/affine-reader
         run: |
@@ -59,8 +63,6 @@ jobs:
           else
             pnpm publish . --no-git-checks
           fi
-        env:
-          NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Push commit
         if: success() && inputs.dry-run == 'false' # Only push if publish was successful and not a dry run
