@@ -1,9 +1,7 @@
 // @ts-nocheck
 import { Node } from "./utils/node";
 
-import converters from "./delta-converters";
-
-export const deltaToMd = (delta) => {
+export const deltaToMd = (delta, converters) => {
   return convert(delta, converters).render().trimEnd() + "\n";
 };
 

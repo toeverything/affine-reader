@@ -1,5 +1,5 @@
 import * as Y from "yjs";
-import { deltaToMd } from "delta-to-md";
+import { deltaToMd, getConverters } from "delta-to-md";
 
 import { html } from "common-tags";
 
@@ -148,10 +148,16 @@ export function parseBlock(
     return null;
   }
 
+  const deltaConverters = getConverters({
+    convertInlineReferenceLink: (ref) => {
+      return context.buildDocUrl(ref.pageId)
+    }
+  });
+
   const id = yBlock.get("sys:id") as string;
   const flavour = yBlock.get("sys:flavour") as Flavour;
   const type = yBlock.get("prop:type") as string;
-  const toMd = () => deltaToMd((yBlock.get("prop:text") as Y.Text).toDelta());
+  const toMd = () => deltaToMd((yBlock.get("prop:text") as Y.Text).toDelta(), deltaConverters);
   const hidden = yBlock.get("prop:hidden") as boolean;
   const displayMode = yBlock.get("prop:displayMode") as string;
   const childrenIds =
@@ -481,18 +487,18 @@ export function parseBlock(
     result.children =
       flavour !== "affine:database"
         ? childrenIds
-            .map((cid) =>
-              parseBlock(
-                context,
-                yBlocks.get(cid) as YBlock | undefined,
-                yBlocks
-              )
+          .map((cid) =>
+            parseBlock(
+              context,
+              yBlocks.get(cid) as YBlock | undefined,
+              yBlocks
             )
-            .filter(
-              (block): block is ParsedBlock =>
-                !!block &&
-                !(block.content === "" && block.children.length === 0)
-            )
+          )
+          .filter(
+            (block): block is ParsedBlock =>
+              !!block &&
+              !(block.content === "" && block.children.length === 0)
+          )
         : [];
   } catch (e) {
     console.warn("Error converting block to md", e);
