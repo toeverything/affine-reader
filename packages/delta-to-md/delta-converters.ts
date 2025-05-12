@@ -14,7 +14,7 @@ export interface ConverterOptions {
 }
 
 const defaultConvertInlineReferenceLink = (reference: InlineReference) => {
-  return [reference.type, reference.pageId, reference.params.mode].filter(Boolean).join(":");
+  return `[${reference.title || ''}](${[reference.type, reference.pageId, reference.params.mode].filter(Boolean).join(":")})`;
 }
 
 export function getConverters(opts: ConverterOptions) {
@@ -44,7 +44,7 @@ export function getConverters(opts: ConverterOptions) {
         return ["[", "](" + url + ")"];
       },
       reference: function (reference: InlineReference) {
-        return ["[", `${reference.title || ''}](${convertInlineReferenceLink(reference)})`];
+        return convertInlineReferenceLink(reference);
       },
       strike: function () {
         return ["~~", "~~"];

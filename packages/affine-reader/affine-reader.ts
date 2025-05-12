@@ -14,7 +14,7 @@ interface ReaderConfig {
    * @deprecated use `parser.blobUrlBuilder` instead
    */
   blobUrlHandler?: (blobId: string) => string;
-  parser?: Partial<Pick<ParserContext, 'buildBlobUrl' | 'buildDocUrl'>>;
+  parser?: Partial<Pick<ParserContext, 'buildBlobUrl' | 'buildDocUrl' | 'renderDocTitle'>>;
 }
 
 const defaultResourcesUrls = {
@@ -163,6 +163,8 @@ export const getBlocksuiteReader = (config: ReaderConfig) => {
     return parsePageDoc({
       buildBlobUrl: config.parser!.buildBlobUrl!,
       buildDocUrl: config.parser!.buildDocUrl!,
+      // should provide by parsing workspace in context
+      renderDocTitle: config.parser!.renderDocTitle,
       workspaceId,
       doc,
     });
