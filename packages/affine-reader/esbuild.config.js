@@ -10,7 +10,7 @@ const result = await build({
   target: "es2015",
   sourcemap: true,
   format: "esm",
-  external: ["yjs", "@shikijs/*"],
+  external: ["yjs"],
   metafile: true,
 });
 
