@@ -1,0 +1,59 @@
+name: Publish affine-reader
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "The new version number (e.g., 1.2.3)"
+        required: true
+        type: string
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Allow to push commits
+      # id-token: write # Needed for provenance, but not for basic npm publish with NPM_TOKEN
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: "pnpm" # Caching pnpm can speed up subsequent runs
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest # Or specify a particular pnpm version
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: ./
+
+      - name: Bump version in package.json
+        working-directory: ./packages/affine-reader
+        run: |
+          npm version ${{ inputs.version }} --no-git-tag-version --allow-same-version
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit package.json changes
+        working-directory: ./
+        run: |
+          git add packages/affine-reader/package.json
+          git commit -m "chore(release): affine-reader@${{ inputs.version }}"
+
+      - name: Publish to npm
+        working-directory: ./packages/affine-reader
+        run: pnpm publish . --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }} # Ensure this secret is set in your repository
+
+      - name: Push commit
+        if: success() # Only push if publish was successful
+        run: git push
+        working-directory: ./
