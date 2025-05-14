@@ -5,7 +5,7 @@
     "tsx": "^4.19.3"
   },
   "scripts": {
-    "dev": "pnpm --dir playground dev",
-    "postinstall": "pnpm --dir packages/affine-reader build"
+    "build": "pnpm --dir packages/affine-reader build",
+    "dev": "pnpm --dir playground dev"
   }
 }
