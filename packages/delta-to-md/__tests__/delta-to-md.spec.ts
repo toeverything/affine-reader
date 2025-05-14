@@ -1,5 +1,12 @@
 import { expect, test } from "vitest";
-import { deltaToMd } from "../delta-to-md";
+import { deltaToMd as deltaToMdOriginal } from "../delta-to-md";
+import { getConverters } from "../delta-converters";
+
+const converters = getConverters()
+function deltaToMd(delta: any) {
+  return deltaToMdOriginal(delta, converters)
+}
+
 
 test("renders inline format", function () {
   expect(
