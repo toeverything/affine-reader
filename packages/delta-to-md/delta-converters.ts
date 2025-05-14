@@ -6,18 +6,21 @@ export interface InlineReference {
   type: 'LinkedPage',
   pageId: string
   title?: string
-  params: { mode: 'doc' | 'edgeless' }
+  params?: { mode: 'doc' | 'edgeless' }
 }
 
 export interface ConverterOptions {
-  convertInlineReferenceLink?: (reference: InlineReference) => string
+  convertInlineReferenceLink?: (reference: InlineReference) => { title: string, link: string}
 }
 
 const defaultConvertInlineReferenceLink = (reference: InlineReference) => {
-  return `[${reference.title || ''}](${[reference.type, reference.pageId, reference.params.mode].filter(Boolean).join(":")})`;
+  return {
+    title: reference.title || '',
+    link: [reference.type, reference.pageId, reference.params?.mode].filter(Boolean).join(":"),
+  }
 }
 
-export function getConverters(opts: ConverterOptions) {
+export function getConverters(opts: ConverterOptions = {}) {
   const { convertInlineReferenceLink = defaultConvertInlineReferenceLink } = opts;
 
   return {
@@ -44,7 +47,8 @@ export function getConverters(opts: ConverterOptions) {
         return ["[", "](" + url + ")"];
       },
       reference: function (reference: InlineReference) {
-        return [convertInlineReferenceLink(reference), ''];
+        const { title, link } = convertInlineReferenceLink(reference);
+        return ["[", `${title}](${link})`];
       },
       strike: function () {
         return ["~~", "~~"];

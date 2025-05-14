@@ -151,7 +151,10 @@ export function parseBlock(
 
   const deltaConverters = getConverters({
     convertInlineReferenceLink: (ref) => {
-      return `[${ref.title || context.renderDocTitle?.(ref.pageId) || ''}](${context.buildDocUrl(ref.pageId)})`
+      return {
+        title: ref.title || context.renderDocTitle?.(ref.pageId) || '',
+        link: context.buildDocUrl(ref.pageId)
+      }
     }
   });
 
